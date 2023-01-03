@@ -1,0 +1,40 @@
+package codice;
+
+import java.util.ArrayList;
+
+/**
+ * 
+ * @author Nicolò Bianchetto
+ * @author Kristian Rigo
+ * 
+ * 
+ * 
+ */
+
+public class Agenda {
+	
+	private String nomeAgenda;
+	private ArrayList<Appuntamento> appuntamenti;
+	
+	private static int numAgende = 0;
+	
+	
+	public Agenda(String nomeAgenda, ArrayList<Appuntamento> appuntamenti) {
+		this.nomeAgenda = nomeAgenda;
+		this.appuntamenti = appuntamenti;
+		numAgende++;
+	}
+	
+	public Agenda(String nomeAgenda) {
+		this(nomeAgenda, new ArrayList<>());
+	}
+	
+	
+	public Agenda() {
+		this("Agenda " + (numAgende+1));
+	}
+	
+	
+	
+	
+}
