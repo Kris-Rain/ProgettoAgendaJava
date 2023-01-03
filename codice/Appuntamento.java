@@ -39,6 +39,10 @@ public class Appuntamento {
 	public String getLuogo() {
 		return luogo;
 	}
+	
+	/**
+		Da sistemare
+	*/
 	public boolean matchNome(String nome) {
 		if(this.nome.contains(nome)) return true;
 		return false;
