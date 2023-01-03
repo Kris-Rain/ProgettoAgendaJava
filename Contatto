@@ -1,0 +1,112 @@
+package rubrica;
+
+import java.util.ArrayList;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
+import eccezioni.ContattoException;
+
+public class Contatto {
+	private String nome;
+	private final String email;
+	private ArrayList<String> numeriTel;
+	
+	
+	private class PatternMatcher {
+		private Pattern pattern;
+		private Matcher matcher;
+		
+		private PatternMatcher(String regex, String match, int ... flags) {
+			int resFlag = 0;
+			for(int i = 0; i < flags.length; i++) resFlag |= flags[i];
+
+			pattern = Pattern.compile(regex, resFlag);
+			matcher = pattern.matcher(match);
+		}
+
+	}
+	
+	public Contatto(String nome, String email) throws ContattoException {
+		controlloEmail(email);
+		controlloNome(nome);
+		this.nome = nome;
+		this.email = email;
+		numeriTel = new ArrayList<>();
+	}
+	
+	
+	public Contatto(String email) throws ContattoException {
+		this("", email);
+	}	
+	
+	private void controlloGenerico(String regex, String match, String messaggio, int ... flags) throws ContattoException {
+		PatternMatcher pm = new PatternMatcher(regex, match, flags);
+		if(!pm.matcher.matches()) throw new ContattoException(messaggio);	
+	}
+	
+	private void controlloEmail(String email) throws ContattoException {
+		controlloGenerico("[A-Z0-9._-]+@[A-Z0-9.-]+\\.[A-Z]{2,7}", email, "Email non valida!", Pattern.CASE_INSENSITIVE);
+	}
+		
+	private void controlloNumero(String numeroTel) throws ContattoException {
+		controlloGenerico("(\\+[0-9]{1,3})?[0-9]{4,15}", numeroTel, "Numero non valido!");
+	}
+		
+	private void controlloNome(String nome) throws ContattoException {
+		controlloGenerico("[A-ZÀ-ú0-9\\s]*", nome, "Nome non valido!", Pattern.CASE_INSENSITIVE);
+	}
+
+	public String getNome() {
+		return nome;
+	}
+
+	public void setNome(String nome) throws ContattoException {
+		controlloNome(nome);
+		this.nome = nome;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+	
+	public ArrayList<String> getNumero(String numero) {
+		ArrayList<String> risultato = new ArrayList<>();
+		if(numeriTel.contains(numero)) risultato.add(numero);
+		return risultato;
+	}
+	
+	public void inserisciNumTel(String numero) throws ContattoException{
+		controlloNumero(numero);
+		if(numeriTel.contains(numero)) throw new ContattoException("Numero già presente!");
+		numeriTel.add(numero);
+	}
+	
+	public boolean eliminaNumTel(String numero) {
+		return numeriTel.removeAll(getNumero(numero));
+	}
+	
+	public String getStringNumTel() {
+		return numeriTel.toString();
+	}
+	
+	public int getNumbersQuantity() {
+		return numeriTel.size();
+	}
+	
+	public boolean matchNome(String nome) {
+		return(this.nome.contains(nome));
+	}
+	
+	public boolean matchEmail(String email) {
+		return(this.email.contains(email));
+	}
+	
+	public String toString() {
+		return ("Nome: " + nome + "\nEmail: " + email + "\nNumeri di Telefono: " + getStringNumTel());
+	}
+	
+	public  boolean equals(Object contatto) {
+		return(contatto instanceof Contatto && ((Contatto) contatto).getEmail() == this.email);
+	}
+	
+}
