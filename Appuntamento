@@ -12,13 +12,31 @@ public class Appuntamento {
 	private String orario;
 	private String durata;
 	private String luogo;
+	private String nome;
 	private ArrayList<String> nomePersone;
 	
-	public Appuntamento(String data, String orario, String durata, String luogo, ArrayList<String> nomePersone) {
+	public Appuntamento(String data, String orario, String durata, String luogo, String nome) {
 		this.data=data;
 		this.orario=orario;
 		this.durata=durata;
 		this.luogo=luogo;
-		this.nomePersone=nomePersone;
+		this.nome=nome;
+		nomePersone.add(nome);
+	}
+	public String getData() {
+		return data;
+	}
+	public String getNome() {
+		return nome;
+	}
+	public String getOrario() {
+		return orario;
+	}
+	public String getDurata() {
+		return durata;
+	}
+	public String getLuogo() {
+		return luogo;
 	}
 }
+
