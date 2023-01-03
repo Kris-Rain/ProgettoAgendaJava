@@ -1,0 +1,24 @@
+package codice;
+
+import java.util.ArrayList;
+
+/**
+ * @author Kristian Rigo
+ * @author Nicolò Bianchetto
+ */
+
+public class Appuntamento {
+	private String data;
+	private String orario;
+	private String durata;
+	private String luogo;
+	private ArrayList<String> nomePersone;
+	
+	public Appuntamento(String data, String orario, String durata, String luogo, ArrayList<String> nomePersone) {
+		this.data=data;
+		this.orario=orario;
+		this.durata=durata;
+		this.luogo=luogo;
+		this.nomePersone=nomePersone;
+	}
+}
