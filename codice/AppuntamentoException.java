@@ -1,3 +1,8 @@
+/**
+ * @author Kristian Rigo
+ * @author Nicolò Bianchetto
+ */
+
 package codice;
 
 public class AppuntamentoException extends Exception{
