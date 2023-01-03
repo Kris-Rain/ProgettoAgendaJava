@@ -106,6 +106,7 @@ public class Agenda implements Iterable<Appuntamento> {
 		return (ArrayList<Appuntamento>) appuntamenti.stream().filter(predicato).collect(Collectors.toList());
 	}
 	
+	/* Da sistemare, meglio usare poi MatchNome e MatchData creati nella classe Appuntamento */
 	public ArrayList<Appuntamento> searchAppuntamentoPerNome(String ... nomi) {	
 		return searchAppuntamentoGenerico( appuntamento -> appuntamento.getNomePersone().containsAll(new ArrayList<>(Arrays.asList(nomi))));
 	}
