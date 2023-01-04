@@ -142,9 +142,35 @@ public class Agenda implements Iterable<Appuntamento> {
 		return stringaAppuntamenti;
 	}
 	
+	/**
+	 * 
+	 * @param appointment
+	 * @return
+	 * 
+	 * Appuntamento da aggiungere: inizia 14:00, termina 15:30
+	 * Appuntamento da aggiungere: inizia 16:00, termina 16:30
+	 * Appuntamento già esistente: inizia 15:00, termina 15:30
+	 * 
+	 * 
+	 * 
+	 * Appuntamento già esistente: data: 04/07 23:30 dura 1 ora	00:30	
+	 * 
+	 * Prendere orario di fine di appointment... se == 23.59 -> split
+	 * 04/04/21 05/04/21
+	 * 30/04/21 01/05/21
+	 * 31/12/21 01/01/22
+	 */
 	public int aggiungiAppuntamento(Appuntamento appointment) {
 		//Qui codice aggiungi.. magari ritorni -1 se l'appuntamento non puoi inserirlo per problemi di sovrapposizione di data/orario
 		//magari ritorni 0 se invece l'appuntamento già esiste nell'agenda
+		Appuntamento test = appuntamenti.get(0);
+		if(appointment.getData().equals(test.getData())) {
+			if(appointment.getOrarioFine().compareTo(test.getOrario()) < 0 || appointment.getOrario().compareTo(test.getOrarioFine()) > 0) {
+				//aggiungi
+			}
+			//else errore
+		}
+		//else aggiungi
 		return 1;
 	}
 	
