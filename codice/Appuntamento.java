@@ -5,27 +5,31 @@
 
 package codice;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 
 public class Appuntamento {
+	private String dataOrario;
 	private String data;
 	private String orario;
+	private String orarioFine;
 	private String durata;
 	private String luogo;
 	private ArrayList<String> persone;
 	
 	public Appuntamento(String data, String orario, String durata, String luogo, String nomePersona) {
+		DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+		String myDateObj = data + orario;
+	   // String formattedDate = myDateObj.format(myFormatObj);
 		this.data=data;
 		this.orario=orario;
 		this.durata=durata;
+		this.orarioFine = sommaOrario(durata);
 		this.luogo=luogo;
 		persone=new ArrayList<String>(Arrays.asList(nomePersona));
-		/* Solo una piccola modifica, ho tolto nome e lasciato loro l'arraylist dei nomi di persone 
-		  per "compattare" il codice il resto è uguale .. puoi cancellare poi questo commento */
 		
 		/* Piccolo appunto, ho guardato per la data, forse ci conviene, e magari è più semplice da gestire,
 		 * utilizzare SimpleDateFormat per la data... che comunque converte la data sempre in una stringa
@@ -55,6 +59,18 @@ public class Appuntamento {
 	public String getLuogo() {
 		return luogo;
 	}
+	public String getOrarioFine() {
+		return orarioFine;
+	}
+	
+	
+	private String sommaOrario(String durata) {
+		String[] split = orario.split("[:-]");
+		int somma = Integer.valueOf(split[0]) * 60 + Integer.valueOf(split[1]) + Integer.parseInt(durata);
+		String minuti = (( somma % 60 ) < 10) ? ("0"+somma%60) : Integer.toString(somma%60);
+		if((int)Math.floor(somma/60) >= 24) return "23:59";
+		return (int)Math.floor(somma/60) + ":" + minuti;
+	}
 	
 	/**
 		Ho provato a definire matchPersone e matchData perché mi servivano per i metodi di Agenda ... 
@@ -75,6 +91,7 @@ public class Appuntamento {
 		... oppure ce ne sbattiamo le palle e basta
 	*/
 	
+	
 	/**
 	 * 
 	 * @param nome
@@ -89,7 +106,7 @@ public class Appuntamento {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * 
 	 * @param primoNome
@@ -103,13 +120,13 @@ public class Appuntamento {
 	 */
 	
 	public boolean matchPersone(String primoNome, String ... extraNomi) {
-		List<String> elencoNomi = Arrays.asList(primoNome);
+		ArrayList<String> elencoNomi = new ArrayList<>(Arrays.asList(primoNome));
 		Collections.addAll(elencoNomi, extraNomi);
 		for(String nome : elencoNomi) 	if(!matchSingoloNome(nome))	return false;
 		return true;
 	}
 	
-	// Ho tolto "if(true) return true; else return false" e ho compattato ... così la Giannini non si trigghera
+
 	public boolean matchData(String data) {
 		return this.data.contains(data);
 	}
