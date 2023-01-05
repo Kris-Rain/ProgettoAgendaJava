@@ -15,9 +15,13 @@ class TestAppuntamento {
 
 	@Test
 	void testCostruttoreCompleto() throws AppuntamentoException {
-		String data = "10-12-2023";
+		String data = "10-12-2024";
 		String orario = "19:59";
 		assertDoesNotThrow(() -> Controllo.controlloData(data));
+		assertDoesNotThrow(() -> Controllo.controlloData("29-02-2024"));
+		assertThrows(AppuntamentoException.class, () -> Controllo.controlloData("29-02-2023"));
+		assertThrows(AppuntamentoException.class, () -> Controllo.controlloData("31-04-2023"));
+		assertDoesNotThrow(() -> Controllo.controlloData("27-07-1998"));
 		assertDoesNotThrow(() -> Controllo.controlloOrario(orario));
 		Appuntamento a1 = new Appuntamento("10-12-2021", "13-30", "30", "Milano", "Luca");
 		assertEquals("10-12-2021", a1.getData());
