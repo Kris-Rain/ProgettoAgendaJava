@@ -5,53 +5,40 @@
 
 package codice;
 
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-
 public class Appuntamento {
-	private String dataOrario;
-	private String data;
-	private String orario;
 	private String orarioFine;
 	private String durata;
 	private String luogo;
 	private ArrayList<String> persone;
+	private DataOrario dataTime;
+	
+	public static class ControlloDati{
+		//regex con controllo data e orario
+		//Controllo.java
+	}
 	
 	public Appuntamento(String data, String orario, String durata, String luogo, String nomePersona) {
-		DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-		String myDateObj = data + orario;
-	   // String formattedDate = myDateObj.format(myFormatObj);
-		this.data=data;
-		this.orario=orario;
+		this(data, orario, durata, luogo, new ArrayList<String>(Arrays.asList(nomePersona)));
+	}
+	public Appuntamento(String data, String orario, String durata, String luogo, ArrayList<String> persone) {
+		this.dataTime = new DataOrario(data, orario);
 		this.durata=durata;
-		this.orarioFine = sommaOrario(durata);
+		this.orarioFine = dataTime.plusMinuti(durata).toString();
 		this.luogo=luogo;
-		persone=new ArrayList<String>(Arrays.asList(nomePersona));
-		
-		/* Piccolo appunto, ho guardato per la data, forse ci conviene, e magari è più semplice da gestire,
-		 * utilizzare SimpleDateFormat per la data... che comunque converte la data sempre in una stringa
-		 * ti lascio dei link per andarti a vedere un po' ... non sembra troppo difficile e forse è anche più comodo.. poi boh
-		 * https://www.tutorialspoint.com/how-to-compare-two-dates-in-java
-		 * https://www.digitalocean.com/community/tutorials/java-simpledateformat-java-date-format
-		 * 
-		 * a sto punto forse anche l'orario ... più che altro perché poi in agenda devo aggiungere l'appuntamento non solo se
-		 * soddisfa i requisiti standard di data, orario, durata etc.. ma anche se non ci sono sovrapposizioni con altre date/orari.
-		 * 
-		 * magari possiamo aggiungere un parametro orarioFine ... ricavato da orarioInizio + durata
-		 * Beh vedremo poi bene sta cosa
-		 * */
+		this.persone=persone;
 	}
 	public String getData() {
-		return data;
+		return dataTime.getDataToString();
 	}
 	public ArrayList<String> getPersone() {
 		return persone;
 	}
 	public String getOrario() {
-		return orario;
+		return dataTime.getOrarioToString();
 	}
 	public String getDurata() {
 		return durata;
@@ -63,14 +50,13 @@ public class Appuntamento {
 		return orarioFine;
 	}
 	
-	
-	private String sommaOrario(String durata) {
+	/*private String sommaOrario(String durata) {
 		String[] split = orario.split("[:-]");
 		int somma = Integer.valueOf(split[0]) * 60 + Integer.valueOf(split[1]) + Integer.parseInt(durata);
 		String minuti = (( somma % 60 ) < 10) ? ("0"+somma%60) : Integer.toString(somma%60);
 		if((int)Math.floor(somma/60) >= 24) return "23:59";
 		return (int)Math.floor(somma/60) + ":" + minuti;
-	}
+	}*/
 	
 	/**
 		Ho provato a definire matchPersone e matchData perché mi servivano per i metodi di Agenda ... 
@@ -85,8 +71,6 @@ public class Appuntamento {
 			if(mat.matches()) return true;
 		}
 		return false;
-		
-		
 		
 		... oppure ce ne sbattiamo le palle e basta
 	*/
@@ -125,9 +109,19 @@ public class Appuntamento {
 		for(String nome : elencoNomi) 	if(!matchSingoloNome(nome))	return false;
 		return true;
 	}
-	
-
 	public boolean matchData(String data) {
-		return this.data.contains(data);
+		return this.getData().contains(data);
+	}
+	public boolean matchDataOrario(String data, String orario) {
+		return (this.getData() + " " + this.getOrario()).contains(data + " " + orario);
+	}
+	public boolean isCompatible(Appuntamento newAppuntamento) {
+		//true se compatibile false se non compatibile
+		if(dataTime.compareTo(newAppuntamento.getData(), newAppuntamento.getOrario())==0) {
+			if(newAppuntamento.getOrarioFine().compareTo(this.getOrario()) <= 0 
+			|| newAppuntamento.getOrario().compareTo(this.getOrarioFine()) >= 0) return true;
+			return false;
+		}
+		return true;
 	}
 }
