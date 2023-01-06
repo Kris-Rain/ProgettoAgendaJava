@@ -191,7 +191,7 @@ public class Agenda implements Iterable<Appuntamento> {
 			case "orario": parametri[1] = newValue; break;
 			case "durata": parametri[2] = newValue; break;
 			case "luogo": parametri[3] = newValue; break;
-			case "persone", "persona": parametri[4] = newValue; break;
+			case "persona": parametri[4] = newValue; break;
 			default: return false;
 		}
 		
