@@ -76,15 +76,14 @@ public class Appuntamento {
 			return pm.matcher.matches();
 		}
 		public static boolean controlloData(String data){
-			if(!controlloGenerico("([0-2][0-9]|(3)[0-1])-(((0)[0-9])|((1)[0-2]))-\\d{4}", data, "Data non valida!",
-					Pattern.CASE_INSENSITIVE)) return false;
+			if(!controlloGenerico("([0-2][0-9]|(3)[0-1])-(((0)[0-9])|((1)[0-2]))-\\d{4}", data, "Data non valida!")) return false;
 			return isDataValida(data);
 		}
 		public static boolean controlloOrario(String orario){
-			return controlloGenerico("([0-1][0-9]|(2)[0-4])[:-]([0-5][0-9])", orario, "Orario non valido!", Pattern.CASE_INSENSITIVE);
+			return controlloGenerico("([0-1][0-9]|(2)[0-4])[:-]([0-5][0-9])", orario, "Orario non valido!");
 		}
 		public static boolean controlloDurata(String durata){
-			return controlloGenerico("[0-9]{1,4}", durata, "Durata non valida!", Pattern.CASE_INSENSITIVE);
+			return controlloGenerico("[0-9]{1,4}", durata, "Durata non valida!");
 		}
 		public static boolean controlloNome(String nome){
 			return controlloGenerico("[a-z0-9]{1,20}", nome, "Nome non valido!", Pattern.CASE_INSENSITIVE);
