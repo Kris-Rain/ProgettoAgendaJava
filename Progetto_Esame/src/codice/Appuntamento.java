@@ -11,6 +11,8 @@ import java.time.format.ResolverStyle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import codice.Appuntamento.ControlloDati.PatternMatcher;
+
 public class Appuntamento {
 	private DataOrario dataTimeInizio;
 	private DataOrario dataTimeFine;
@@ -24,6 +26,15 @@ public class Appuntamento {
 		public static class PatternMatcher {
 			private Pattern pattern;
 			private Matcher matcher;
+			
+			//Sistematina a patternmatcher
+			public boolean matches() {
+				return matcher.matches();
+			}
+			
+			public static PatternMatcher create(String regex, String match, int ... flags) {
+				return new PatternMatcher(regex, match, flags);
+			}
 
 			private PatternMatcher(String regex, String match, int... flags) {
 				int resFlag = 0;
@@ -80,7 +91,7 @@ public class Appuntamento {
 			return isDataValida(data);
 		}
 		public static boolean controlloOrario(String orario){
-			return controlloGenerico("([0-1][0-9]|(2)[0-4])[:-]([0-5][0-9])", orario, "Orario non valido!");
+			return controlloGenerico("([0-1][0-9]|(2)[0-4])-([0-5][0-9])", orario, "Orario non valido!");
 		}
 		public static boolean controlloDurata(String durata){
 			return controlloGenerico("[0-9]{1,4}", durata, "Durata non valida!");
@@ -94,17 +105,15 @@ public class Appuntamento {
 	}
 	
 	public Appuntamento(String data, String orario, String durata, String luogo, String nomePersona) throws AppuntamentoException{
-		if(!ControlloDati.controlloData(data)) throw new AppuntamentoException("Data non valido!");
-		if(!ControlloDati.controlloOrario(orario)) throw new AppuntamentoException("Orario non valido!");
-		if(!ControlloDati.controlloNome(nomePersona)) throw new AppuntamentoException("Nome non valido!");
-		if(!ControlloDati.controlloLuogo(luogo)) throw new AppuntamentoException("Luogo non valido!");
-		if(!ControlloDati.controlloDurata(durata)) throw new AppuntamentoException("Durata non valida!");
+		testParametri(data, orario, durata, luogo, nomePersona);
 		this.dataTimeInizio = new DataOrario(data, orario);
 		this.dataTimeFine = dataTimeInizio.plusMinuti(durata);
 		this.durata=durata;
 		this.luogo=luogo;
 		this.nomePersona=nomePersona;
 	}
+	
+
 	public String getData() {
 		return dataTimeInizio.getDataToString();
 	}
@@ -120,39 +129,55 @@ public class Appuntamento {
 	public String getLuogo() {
 		return luogo;
 	}
-	private DataOrario getDataTimeFine() {
+	
+	//Gli ho resi pubblici perché servono ad Agenda per ordinare gli appuntamenti per data
+	public DataOrario getDataTimeFine() {
 		return dataTimeFine;
 	}
-	private DataOrario getDataTimeInizio() {
+	public DataOrario getDataTimeInizio() {
 		return dataTimeInizio;
 	}
+
+	private void testParametri(String data, String orario, String durata, String luogo, String nomePersona) throws AppuntamentoException {
+		if( !(ControlloDati.controlloData(data) &&
+			  ControlloDati.controlloOrario(orario) &&
+			  ControlloDati.controlloNome(nomePersona) &&
+			  ControlloDati.controlloLuogo(luogo) &&
+			  ControlloDati.controlloDurata(durata)) )	throw new AppuntamentoException("Durata non valida!");
+	}
+
 	
-	/**
-	 * 
-	 * @param nome
-	 * @return
-	 * 
-	 * Faccio il contains per ogni persona dell'arraylist... mi basta che anche solo una persona contenga la sequenza
-	 */
-	
+	//Compattato
 	public boolean matchPersona(String nome) {
-		Pattern pat = Pattern.compile(nome, Pattern.CASE_INSENSITIVE);
-		Matcher mat = pat.matcher(this.nomePersona);
-		return mat.matches();
+		return PatternMatcher.create(nome, this.nomePersona, Pattern.CASE_INSENSITIVE).matches();
 
 	}
 
 	public boolean matchData(String data) {
 		return this.getData().contains(data);
 	}
+	
 	public boolean matchDataOrario(String data, String orario) {
 		return (this.getData() + " " + this.getOrario()).contains(data + " " + orario);
 	}
-	public boolean isCompatible(Appuntamento newAppuntamento) {
-		if(newAppuntamento.getDataTimeInizio().compareTo(dataTimeInizio)<0 
-		&& newAppuntamento.getDataTimeFine().compareTo(dataTimeInizio)<=0 
-		|| newAppuntamento.getDataTimeInizio().compareTo(dataTimeFine)>=0) return true;
-		return false;
+	
+	
+	/*
+	 * Ho "diviso" in due perché mi sembra più leggibile il codice così ... boh sostanzialemente non cambia nulla in realtà
+	 */
+	
+	public boolean isAfter(Appuntamento other) {
+		//Se inizio dopo che l'altro finisca, ritorno true
+		return (this.dataTimeInizio.compareTo(other.getDataTimeFine()) >= 0);
+	}
+	
+	public boolean isBefore(Appuntamento other) {
+		//Se finisco prima che l'altro inizi, ritorno true
+		return (this.dataTimeFine.compareTo(other.getDataTimeInizio()) <= 0);
+	}
+	
+	//metto this almeno si capisce di più a cosa mi riferisco
+	public boolean isCompatible(Appuntamento other) {
+		return this.isAfter(other) || this.isBefore(other);
 	}
 }
-
