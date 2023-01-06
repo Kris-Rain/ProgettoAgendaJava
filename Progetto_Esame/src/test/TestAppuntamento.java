@@ -29,7 +29,7 @@ class TestAppuntamento {
 	}
 	
 	@Test
-	void testIsCompatible() {
+	void testIsCompatible() throws AppuntamentoException {
 		Appuntamento a1 = new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca");
 		Appuntamento a2 = new Appuntamento("10-12-2021", "23-45", "30", "Milano", "Luca");
 		Appuntamento a3 = new Appuntamento("11-12-2021", "13-30", "30", "Milano", "Luca");
@@ -42,7 +42,7 @@ class TestAppuntamento {
 	}
 	
 	@Test
-	void testMatchSingoloNome() {
+	void testMatchSingoloNome() throws AppuntamentoException {
 		assertTrue(new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca").matchPersona("LUCA"));
 		assertTrue(new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca").matchPersona("luca"));
 		assertTrue(new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca").matchPersona("Luca"));
