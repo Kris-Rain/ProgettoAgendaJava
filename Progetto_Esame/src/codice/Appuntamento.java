@@ -88,13 +88,20 @@ public class Appuntamento {
 		public static boolean controlloNome(String nome){
 			return controlloGenerico("[a-z0-9]{1,20}", nome, "Nome non valido!", Pattern.CASE_INSENSITIVE);
 		}
+		public static boolean controlloLuogo(String luogo){
+			return controlloGenerico("[a-z]{1,20}", luogo, "Luogo non valido!", Pattern.CASE_INSENSITIVE);
+		}
 	}
 	
-	public Appuntamento(String data, String orario, String durata, String luogo, String nomePersona) {
-		if(!ControlloDati.controlloData(data));
+	public Appuntamento(String data, String orario, String durata, String luogo, String nomePersona) throws AppuntamentoException{
+		if(!ControlloDati.controlloData(data)) throw new AppuntamentoException("Data non valido!");
+		if(!ControlloDati.controlloOrario(orario)) throw new AppuntamentoException("Orario non valido!");
+		if(!ControlloDati.controlloNome(nomePersona)) throw new AppuntamentoException("Nome non valido!");
+		if(!ControlloDati.controlloLuogo(luogo)) throw new AppuntamentoException("Luogo non valido!");
+		if(!ControlloDati.controlloDurata(durata)) throw new AppuntamentoException("Durata non valida!");
 		this.dataTimeInizio = new DataOrario(data, orario);
-		this.durata=durata;
 		this.dataTimeFine = dataTimeInizio.plusMinuti(durata);
+		this.durata=durata;
 		this.luogo=luogo;
 		this.nomePersona=nomePersona;
 	}
@@ -148,3 +155,4 @@ public class Appuntamento {
 		return false;
 	}
 }
+
