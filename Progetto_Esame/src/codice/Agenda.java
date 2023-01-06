@@ -109,7 +109,7 @@ public class Agenda implements Iterable<Appuntamento> {
 	}
 	
 	public ArrayList<Appuntamento> searchAppuntamentoPerPersona(String nome) {	
-		return searchAppuntamentoGenerico( appuntamento -> appuntamento.matchPersone(nome));
+		return searchAppuntamentoGenerico( appuntamento -> appuntamento.matchPersona(nome));
 	}
 	
 	public ArrayList<Appuntamento> searchAppuntamentoPerData(String data) {
@@ -135,9 +135,8 @@ public class Agenda implements Iterable<Appuntamento> {
 	 * so sta cosa perché l'aveva detto Guazzone a lezione di algoritmi
 	 */
 	
-	private void ordinaAppuntamenti() {
-		appuntamenti.sort( (first, second) -> first.getOrario().compareTo(second.getOrario()));
-		appuntamenti.sort( (first, second) -> first.getData().compareTo(second.getData()));
+	public void ordinaAppuntamenti() {
+		appuntamenti.sort( (first, second) -> first.getDataTimeInizio().compareTo(second.getDataTimeInizio()));
 	}
 	
 	@Override
@@ -151,7 +150,9 @@ public class Agenda implements Iterable<Appuntamento> {
 		for(Appuntamento elemento: this) {
 			if(!appointment.isCompatible(elemento))	return false;
 		}
-		return appuntamenti.add(appointment);
+		appuntamenti.add(appointment);
+		ordinaAppuntamenti();
+		return true;
 	}
 	
 	
@@ -184,8 +185,8 @@ public class Agenda implements Iterable<Appuntamento> {
 				vecchioAppuntamento.getLuogo(),
 				vecchioAppuntamento.getPersona()
 		};
-		Appuntamento nuovoAppuntamento;
-		
+
+
 		switch(parametroDaModificare.toLowerCase().strip()) {
 			case "data": parametri[0] = newValue; break;
 			case "orario": parametri[1] = newValue; break;
@@ -194,10 +195,13 @@ public class Agenda implements Iterable<Appuntamento> {
 			case "persona": parametri[4] = newValue; break;
 			default: return false;
 		}
+
 		
 		try {
-			nuovoAppuntamento = new Appuntamento(parametri[0], parametri[1], parametri[2], parametri[3], parametri[4]);
+			Appuntamento nuovoAppuntamento = new Appuntamento(parametri[0], parametri[1], parametri[2], parametri[3], parametri[4]);
+			for(Appuntamento elemento: this) if(!nuovoAppuntamento.isCompatible(elemento)) return false;
 			appuntamenti.set(appuntamenti.indexOf(vecchioAppuntamento), nuovoAppuntamento);
+			ordinaAppuntamenti();
 		} 
 		catch(AppuntamentoException e) {
 			return false;
@@ -213,5 +217,8 @@ public class Agenda implements Iterable<Appuntamento> {
 		return new IteratoreAgenda();
 	}
 	
+	public void salvaAgendaSuFile() {
+		/* Codice scrittura su file */
+	}
 	
 }
