@@ -84,10 +84,10 @@ public class Appuntamento {
 			return controlloGenerico("([0-1][0-9]|(2)[0-4])[:-]([0-5][0-9])", orario, "Orario non valido!", Pattern.CASE_INSENSITIVE);
 		}
 		public static boolean controlloDurata(String durata){
-			return controlloGenerico("[0-9]{4}", durata, "Durata non valida!", Pattern.CASE_INSENSITIVE);
+			return controlloGenerico("[0-9]{1,4}", durata, "Durata non valida!", Pattern.CASE_INSENSITIVE);
 		}
 		public static boolean controlloNome(String nome){
-			return controlloGenerico("[a-z0-9]{20}", nome, "Nome non valido!", Pattern.CASE_INSENSITIVE);
+			return controlloGenerico("[a-z0-9]{1,20}", nome, "Nome non valido!", Pattern.CASE_INSENSITIVE);
 		}
 	}
 	
