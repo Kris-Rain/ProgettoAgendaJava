@@ -1,3 +1,4 @@
+
 /**
  * @author Kristian Rigo
  * @author Nicolò Bianchetto
@@ -8,8 +9,9 @@ package test;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import codice.Appuntamento;
+import codice.Appuntamento.ControlloDati;
 import codice.AppuntamentoException;
-import codice.Controllo;
+
 
 class TestAppuntamento {
 
@@ -17,12 +19,12 @@ class TestAppuntamento {
 	void testCostruttoreCompleto() throws AppuntamentoException {
 		String data = "10-12-2024";
 		String orario = "19-59";
-		assertDoesNotThrow(() -> Controllo.controlloData(data));
-		assertDoesNotThrow(() -> Controllo.controlloData("29-02-2024"));
-		assertThrows(AppuntamentoException.class, () -> Controllo.controlloData("29-02-2023"));
-		assertThrows(AppuntamentoException.class, () -> Controllo.controlloData("31-04-2023"));
-		assertDoesNotThrow(() -> Controllo.controlloData("27-07-1998"));
-		assertDoesNotThrow(() -> Controllo.controlloOrario(orario));
+		assertTrue(ControlloDati.controlloData(data));
+		assertTrue(ControlloDati.controlloData("29-02-2024"));
+		assertFalse(ControlloDati.controlloData("29-02-2023"));
+		assertFalse(ControlloDati.controlloData("31-04-2023"));
+		assertTrue(ControlloDati.controlloData("27-07-1998"));
+		assertTrue(ControlloDati.controlloOrario(orario));
 		Appuntamento a1 = new Appuntamento("10-12-2021", "13-30", "30", "Milano", "Luca");
 		assertEquals("10-12-2021", a1.getData());
 		assertFalse(a1.matchPersona("Giacomo"));
