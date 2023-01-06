@@ -5,40 +5,108 @@
 
 package codice;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Appuntamento {
-	private String orarioFine;
+	private DataOrario dataTimeInizio;
+	private DataOrario dataTimeFine;
 	private String durata;
 	private String luogo;
-	private ArrayList<String> persone;
-	private DataOrario dataTime;
+	private String nomePersona;
 	
 	public static class ControlloDati{
 		//regex con controllo data e orario
 		//Controllo.java
+		public static class PatternMatcher {
+			private Pattern pattern;
+			private Matcher matcher;
+
+			private PatternMatcher(String regex, String match, int... flags) {
+				int resFlag = 0;
+				for (int i = 0; i < flags.length; i++)
+					resFlag |= flags[i];
+
+				pattern = Pattern.compile(regex, resFlag);
+				matcher = pattern.matcher(match);
+			}
+		}
+		
+		/**
+		 * 
+		 * @param data
+		 * @throws AppuntamentoException
+		 * 
+		 * Dopo la regex, faccio questo test per verificare che la data abbia senso.
+		 * 
+		 * DataTimeFormatter è un "Formatter" per stampa/parse (analisi) di DataTime
+		 * al metodo ofPattern() gli do il pattern, in questo caso dd-MM-uuuu (giorni-mesi-anni)
+		 * ResolverStyle è un enumerazione di valori. Mi indica i diversi stili di parsing
+		 * 
+		 * Ci sono Lenient, Smart e Strict
+		 * 
+		 * Lenient
+		 * accetto tutto
+		 * anche robe come 30 febbraio volendo
+		 * 
+		 * Smart
+		 * se la data è 30 febbraio la trasforma in 28 oppure 29 febbraio se bisestile
+		 * 
+		 * Strict (quello che uso)
+		 * non accetto proprio roba come
+		 * 31 Aprile
+		 * 30 Febbraio
+		 * 
+		 */
+		
+		private static boolean isDataValida(String data){
+			try {
+				DateTimeFormatter.ofPattern("dd-MM-uuuu").withResolverStyle(ResolverStyle.STRICT).parse(data);
+			}
+			catch(DateTimeParseException e) {
+				return false;
+			}
+			return true;
+		}
+		private static boolean controlloGenerico(String regex, String match, String messaggio, int... flags){
+			PatternMatcher pm = new PatternMatcher(regex, match, flags);
+			return pm.matcher.matches();
+		}
+		public static boolean controlloData(String data){
+			if(!controlloGenerico("([0-2][0-9]|(3)[0-1])-(((0)[0-9])|((1)[0-2]))-\\d{4}", data, "Data non valida!",
+					Pattern.CASE_INSENSITIVE)) return false;
+			return isDataValida(data);
+		}
+		public static boolean controlloOrario(String orario){
+			return controlloGenerico("([0-1][0-9]|(2)[0-4])[:-]([0-5][0-9])", orario, "Orario non valido!", Pattern.CASE_INSENSITIVE);
+		}
+		public static boolean controlloDurata(String durata){
+			return controlloGenerico("[0-9]{4}", durata, "Durata non valida!", Pattern.CASE_INSENSITIVE);
+		}
+		public static boolean controlloNome(String nome){
+			return controlloGenerico("[a-z0-9]{20}", nome, "Nome non valido!", Pattern.CASE_INSENSITIVE);
+		}
 	}
 	
 	public Appuntamento(String data, String orario, String durata, String luogo, String nomePersona) {
-		this(data, orario, durata, luogo, new ArrayList<String>(Arrays.asList(nomePersona)));
-	}
-	public Appuntamento(String data, String orario, String durata, String luogo, ArrayList<String> persone) {
-		this.dataTime = new DataOrario(data, orario);
+		if(!ControlloDati.controlloData(data));
+		this.dataTimeInizio = new DataOrario(data, orario);
 		this.durata=durata;
-		this.orarioFine = dataTime.plusMinuti(durata).toString();
+		this.dataTimeFine = dataTimeInizio.plusMinuti(durata);
 		this.luogo=luogo;
-		this.persone=persone;
+		this.nomePersona=nomePersona;
 	}
 	public String getData() {
-		return dataTime.getDataToString();
+		return dataTimeInizio.getDataToString();
 	}
-	public ArrayList<String> getPersone() {
-		return persone;
+	public String getPersona() {
+		return nomePersona;
 	}
 	public String getOrario() {
-		return dataTime.getOrarioToString();
+		return dataTimeInizio.getOrarioToString();
 	}
 	public String getDurata() {
 		return durata;
@@ -46,35 +114,12 @@ public class Appuntamento {
 	public String getLuogo() {
 		return luogo;
 	}
-	public String getOrarioFine() {
-		return orarioFine;
+	private DataOrario getDataTimeFine() {
+		return dataTimeFine;
 	}
-	
-	/*private String sommaOrario(String durata) {
-		String[] split = orario.split("[:-]");
-		int somma = Integer.valueOf(split[0]) * 60 + Integer.valueOf(split[1]) + Integer.parseInt(durata);
-		String minuti = (( somma % 60 ) < 10) ? ("0"+somma%60) : Integer.toString(somma%60);
-		if((int)Math.floor(somma/60) >= 24) return "23:59";
-		return (int)Math.floor(somma/60) + ":" + minuti;
-	}*/
-	
-	/**
-		Ho provato a definire matchPersone e matchData perché mi servivano per i metodi di Agenda ... 
-		Sei libero di modificarli come vuoi
-		Purtroppo contains è case sensitive, se vogliamo fare che l'utente ricerca per nome case-insensitive
-		ci tocca usare il pattern-matcher (ho guardato su stackoverflow pare l'unico modo) ... 
-		
-		Una roba del genere
-		Pattern pat = Pattern.compile("Marco", Pattern.CASE_INSENSITIVE);
-		for(String nome: persone) {
-			Matcher mat = pat.matcher(nome);
-			if(mat.matches()) return true;
-		}
-		return false;
-		
-		... oppure ce ne sbattiamo le palle e basta
-	*/
-	
+	private DataOrario getDataTimeInizio() {
+		return dataTimeInizio;
+	}
 	
 	/**
 	 * 
@@ -84,31 +129,13 @@ public class Appuntamento {
 	 * Faccio il contains per ogni persona dell'arraylist... mi basta che anche solo una persona contenga la sequenza
 	 */
 	
-	private boolean matchSingoloNome(String nome) {
-		for(String persona: persone) {
-			if(persona.contains(nome)) return true;
-		}
-		return false;
+	public boolean matchPersona(String nome) {
+		Pattern pat = Pattern.compile(nome, Pattern.CASE_INSENSITIVE);
+		Matcher mat = pat.matcher(this.nomePersona);
+		return mat.matches();
+
 	}
 
-	/**
-	 * 
-	 * @param primoNome
-	 * @param extraNomi
-	 * @return
-	 * 
-	 * Ho messo primoNome e poi extraNomi perché voglio almeno un parametro String obbligatorio
-	 * Se ho più di un nome vuol dire che voglio che per ogni nome della ricerca
-	 * ci sia almeno una persona nell'arraylist che soddisfi il "contains"
-	 * 
-	 */
-	
-	public boolean matchPersone(String primoNome, String ... extraNomi) {
-		ArrayList<String> elencoNomi = new ArrayList<>(Arrays.asList(primoNome));
-		Collections.addAll(elencoNomi, extraNomi);
-		for(String nome : elencoNomi) 	if(!matchSingoloNome(nome))	return false;
-		return true;
-	}
 	public boolean matchData(String data) {
 		return this.getData().contains(data);
 	}
@@ -116,12 +143,9 @@ public class Appuntamento {
 		return (this.getData() + " " + this.getOrario()).contains(data + " " + orario);
 	}
 	public boolean isCompatible(Appuntamento newAppuntamento) {
-		//true se compatibile false se non compatibile
-		if(dataTime.compareTo(newAppuntamento.getData(), newAppuntamento.getOrario())==0) {
-			if(newAppuntamento.getOrarioFine().compareTo(this.getOrario()) <= 0 
-			|| newAppuntamento.getOrario().compareTo(this.getOrarioFine()) >= 0) return true;
-			return false;
-		}
-		return true;
+		if(newAppuntamento.getDataTimeInizio().compareTo(dataTimeInizio)<0 
+		&& newAppuntamento.getDataTimeFine().compareTo(dataTimeInizio)<=0 
+		|| newAppuntamento.getDataTimeInizio().compareTo(dataTimeFine)>=0) return true;
+		return false;
 	}
 }
