@@ -11,6 +11,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 
+
 /**
  * 
  * @author Nicolò Bianchetto
@@ -107,12 +108,16 @@ public class Agenda implements Iterable<Appuntamento> {
 		return (ArrayList<Appuntamento>) appuntamenti.stream().filter(predicato).collect(Collectors.toList());
 	}
 	
-	public ArrayList<Appuntamento> searchAppuntamentoPerPersona(String nome, String ... extraNomi) {	
-		return searchAppuntamentoGenerico( appuntamento -> appuntamento.matchPersone(nome, extraNomi));
+	public ArrayList<Appuntamento> searchAppuntamentoPerPersona(String nome) {	
+		return searchAppuntamentoGenerico( appuntamento -> appuntamento.matchPersone(nome));
 	}
 	
 	public ArrayList<Appuntamento> searchAppuntamentoPerData(String data) {
 		return searchAppuntamentoGenerico( appuntamento -> appuntamento.matchData(data));
+	}
+	
+	public ArrayList<Appuntamento> searchAppuntamentoPerDataOrario(String data, String orario) {
+		return searchAppuntamentoGenerico( appuntamento -> appuntamento.matchDataOrario(data, orario));
 	}
 	
 	/**
@@ -141,38 +146,66 @@ public class Agenda implements Iterable<Appuntamento> {
 		for(Appuntamento appointment: this) stringaAppuntamenti+= appointment.toString();
 		return stringaAppuntamenti;
 	}
-	
-	/**
-	 * 
-	 * @param appointment
-	 * @return
-	 * 
-	 * Appuntamento da aggiungere: inizia 14:00, termina 15:30
-	 * Appuntamento da aggiungere: inizia 16:00, termina 16:30
-	 * Appuntamento già esistente: inizia 15:00, termina 15:30
-	 * 
-	 * 
-	 * 
-	 * Appuntamento già esistente: data: 04/07 23:30 dura 1 ora	00:30	
-	 * 
-	 * Prendere orario di fine di appointment... se == 23.59 -> split
-	 * 04/04/21 05/04/21
-	 * 30/04/21 01/05/21
-	 * 31/12/21 01/01/22
-	 */
-	public int aggiungiAppuntamento(Appuntamento appointment) {
-		//Qui codice aggiungi.. magari ritorni -1 se l'appuntamento non puoi inserirlo per problemi di sovrapposizione di data/orario
-		//magari ritorni 0 se invece l'appuntamento già esiste nell'agenda
-		Appuntamento test = appuntamenti.get(0);
-		if(appointment.getData().equals(test.getData())) {
-			if(appointment.getOrarioFine().compareTo(test.getOrario()) < 0 || appointment.getOrario().compareTo(test.getOrarioFine()) > 0) {
-				//aggiungi
-			}
-			//else errore
+
+	public boolean aggiungiAppuntamento(Appuntamento appointment) {
+		for(Appuntamento elemento: this) {
+			if(!appointment.isCompatible(elemento))	return false;
 		}
-		//else aggiungi
-		return 1;
+		return appuntamenti.add(appointment);
 	}
+	
+	
+	public boolean aggiungiAppuntamento(String data, String orario, String durata, String luogo, String nomePersona) throws AppuntamentoException {
+		return aggiungiAppuntamento(new Appuntamento(data, orario, durata, luogo, nomePersona));
+	}
+	
+	public boolean rimuoviPerPersona(String nome) {
+		return appuntamenti.removeAll(searchAppuntamentoPerPersona(nome));
+	}
+	
+	public boolean rimuoviPerData(String data) {
+		return appuntamenti.removeAll(searchAppuntamentoPerData(data));
+	}
+	
+	public boolean rimuoviPerDataOrario(String data, String orario) {
+		return appuntamenti.removeAll(searchAppuntamentoPerDataOrario(data, orario));
+	}
+	
+
+	public boolean modificaAppuntamento(String dataApp, String orarioApp, String parametroDaModificare, String newValue) {
+		ArrayList<Appuntamento> risultato = searchAppuntamentoPerDataOrario(dataApp, orarioApp);
+		if(risultato.isEmpty()) return false;
+		Appuntamento vecchioAppuntamento = risultato.get(0);
+		
+		String[] parametri = {
+				vecchioAppuntamento.getData(),
+				vecchioAppuntamento.getOrario(),
+				vecchioAppuntamento.getDurata(),
+				vecchioAppuntamento.getLuogo(),
+				vecchioAppuntamento.getPersona()
+		};
+		Appuntamento nuovoAppuntamento;
+		
+		switch(parametroDaModificare.toLowerCase().strip()) {
+			case "data": parametri[0] = newValue; break;
+			case "orario": parametri[1] = newValue; break;
+			case "durata": parametri[2] = newValue; break;
+			case "luogo": parametri[3] = newValue; break;
+			case "persone", "persona": parametri[4] = newValue; break;
+			default: return false;
+		}
+		
+		try {
+			nuovoAppuntamento = new Appuntamento(parametri[0], parametri[1], parametri[2], parametri[3], parametri[4]);
+			appuntamenti.set(appuntamenti.indexOf(vecchioAppuntamento), nuovoAppuntamento);
+		} 
+		catch(AppuntamentoException e) {
+			return false;
+		}
+		
+		return true;
+	}
+	
 	
 
 	@Override
