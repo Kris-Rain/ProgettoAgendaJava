@@ -116,8 +116,24 @@ public class Agenda implements Iterable<Appuntamento> {
 		return searchAppuntamentoGenerico( appuntamento -> appuntamento.matchData(data));
 	}
 	
-	public ArrayList<Appuntamento> searchAppuntamentoPerDataOrario(String data, String orario) {
+	private ArrayList<Appuntamento> searchAppuntamentoPerDataOrario(String data, String orario) {
 		return searchAppuntamentoGenerico( appuntamento -> appuntamento.matchDataOrario(data, orario));
+	}
+	
+	
+	public boolean contains(Appuntamento app) {
+		return appuntamenti.contains(app);
+	}
+	
+	public boolean contains(String data, String orario) {
+		return !searchAppuntamentoPerDataOrario(data, orario).isEmpty();
+	}
+	
+	public boolean isCompatible(Appuntamento appointment) {
+		for(Appuntamento elemento: this) {
+			if(!appointment.isCompatible(elemento))	return false;
+		}
+		return true;
 	}
 	
 	/**
@@ -147,9 +163,7 @@ public class Agenda implements Iterable<Appuntamento> {
 	}
 
 	public boolean aggiungiAppuntamento(Appuntamento appointment) {
-		for(Appuntamento elemento: this) {
-			if(!appointment.isCompatible(elemento))	return false;
-		}
+		if(!this.isCompatible(appointment)) return false;
 		appuntamenti.add(appointment);
 		ordinaAppuntamenti();
 		return true;
@@ -199,7 +213,7 @@ public class Agenda implements Iterable<Appuntamento> {
 		
 		try {
 			Appuntamento nuovoAppuntamento = new Appuntamento(parametri[0], parametri[1], parametri[2], parametri[3], parametri[4]);
-			for(Appuntamento elemento: this) if(!nuovoAppuntamento.isCompatible(elemento)) return false;
+			if(!this.isCompatible(nuovoAppuntamento)) return false;
 			appuntamenti.set(appuntamenti.indexOf(vecchioAppuntamento), nuovoAppuntamento);
 			ordinaAppuntamenti();
 		} 
