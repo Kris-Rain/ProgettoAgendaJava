@@ -146,7 +146,7 @@ public class Appuntamento {
 			  ControlloDati.controlloOrario(orario) &&
 			  ControlloDati.controlloNome(nomePersona) &&
 			  ControlloDati.controlloLuogo(luogo) &&
-			  ControlloDati.controlloDurata(durata)) )	throw new AppuntamentoException("Durata non valida!");
+			  ControlloDati.controlloDurata(durata)) )	throw new AppuntamentoException("Dati non validi!");
 	}
 
 	
