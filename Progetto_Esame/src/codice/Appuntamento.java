@@ -97,7 +97,7 @@ public class Appuntamento {
 		
 		//Cambiato la regex, la durata non accetta 0 e basta oppure 000 o 00000 perché un appuntamento che non dura nulla non ha senso
 		public static boolean controlloDurata(String durata){
-			return controlloGenerico("([1-9][0-9]{1,3})|(0+[1-9]{1,4})", durata);
+			return controlloGenerico("(0*[1-9][0-9]{0,3})", durata);
 		}
 		public static boolean controlloNome(String nome){
 			return controlloGenerico("[a-z0-9]{1,20}", nome, Pattern.CASE_INSENSITIVE);
