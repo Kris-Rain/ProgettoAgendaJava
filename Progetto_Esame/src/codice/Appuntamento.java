@@ -92,7 +92,7 @@ public class Appuntamento {
 			return isDataValida(data);
 		}
 		public static boolean controlloOrario(String orario){
-			return controlloGenerico("([0-1][0-9]|(2)[0-4])-([0-5][0-9])", orario);
+			return controlloGenerico("([0-1][0-9]|(2)[0-3])-([0-5][0-9])", orario);
 		}
 		
 		//Cambiato la regex, la durata non accetta 0 e basta oppure 000 o 00000 perché un appuntamento che non dura nulla non ha senso
