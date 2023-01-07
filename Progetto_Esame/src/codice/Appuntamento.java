@@ -82,25 +82,28 @@ public class Appuntamento {
 			}
 			return true;
 		}
-		private static boolean controlloGenerico(String regex, String match, String messaggio, int... flags){
-			PatternMatcher pm = new PatternMatcher(regex, match, flags);
-			return pm.matcher.matches();
+		
+		private static boolean controlloGenerico(String regex, String match, int ... flags){
+			return PatternMatcher.create(regex, match, flags).matches();
 		}
+		
 		public static boolean controlloData(String data){
-			if(!controlloGenerico("([0-2][0-9]|(3)[0-1])-(((0)[0-9])|((1)[0-2]))-\\d{4}", data, "Data non valida!")) return false;
+			if(!controlloGenerico("([0-2][0-9]|(3)[0-1])-(((0)[0-9])|((1)[0-2]))-\\d{4}", data)) return false;
 			return isDataValida(data);
 		}
 		public static boolean controlloOrario(String orario){
-			return controlloGenerico("([0-1][0-9]|(2)[0-4])-([0-5][0-9])", orario, "Orario non valido!");
+			return controlloGenerico("([0-1][0-9]|(2)[0-4])-([0-5][0-9])", orario);
 		}
+		
+		//Cambiato la regex, la durata non accetta 0 e basta oppure 000 o 00000 perché un appuntamento che non dura nulla non ha senso
 		public static boolean controlloDurata(String durata){
-			return controlloGenerico("[0-9]{1,4}", durata, "Durata non valida!");
+			return controlloGenerico("([1-9][0-9]{1,3})|(0+[1-9]{1,4})", durata);
 		}
 		public static boolean controlloNome(String nome){
-			return controlloGenerico("[a-z0-9]{1,20}", nome, "Nome non valido!", Pattern.CASE_INSENSITIVE);
+			return controlloGenerico("[a-z0-9]{1,20}", nome, Pattern.CASE_INSENSITIVE);
 		}
 		public static boolean controlloLuogo(String luogo){
-			return controlloGenerico("[a-z]{1,20}", luogo, "Luogo non valido!", Pattern.CASE_INSENSITIVE);
+			return controlloGenerico("[a-z]{1,20}", luogo, Pattern.CASE_INSENSITIVE);
 		}
 	}
 	
