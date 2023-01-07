@@ -111,7 +111,7 @@ public class Appuntamento {
 		testParametri(data, orario, durata, luogo, nomePersona);
 		this.dataTimeInizio = new DataOrario(data, orario);
 		this.dataTimeFine = dataTimeInizio.plusMinuti(durata);
-		this.durata=durata;
+		this.durata=durata.replaceFirst("^0*", "");
 		this.luogo=luogo;
 		this.nomePersona=nomePersona;
 	}
