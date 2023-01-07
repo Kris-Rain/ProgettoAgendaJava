@@ -25,6 +25,11 @@ class TestAppuntamento {
 		assertFalse(ControlloDati.controlloData("31-04-2023"));
 		assertTrue(ControlloDati.controlloData("27-07-1998"));
 		assertTrue(ControlloDati.controlloOrario(orario));
+		assertTrue(ControlloDati.controlloDurata("01"));
+		assertTrue(ControlloDati.controlloDurata("02361"));
+		assertTrue(ControlloDati.controlloDurata("9999"));
+		assertFalse(ControlloDati.controlloDurata("10000"));
+		assertFalse(ControlloDati.controlloDurata("000000000"));
 		Appuntamento a1 = new Appuntamento("10-12-2021", "13-30", "30", "Milano", "Luca");
 		assertEquals("10-12-2021", a1.getData());
 		assertFalse(a1.matchPersona("Giacomo"));
