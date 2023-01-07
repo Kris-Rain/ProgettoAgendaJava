@@ -110,8 +110,8 @@ public class Appuntamento {
 	public Appuntamento(String data, String orario, String durata, String luogo, String nomePersona) throws AppuntamentoException{
 		testParametri(data, orario, durata, luogo, nomePersona);
 		this.dataTimeInizio = new DataOrario(data, orario);
-		this.dataTimeFine = dataTimeInizio.plusMinuti(durata);
 		this.durata=durata.replaceFirst("^0*", "");
+		this.dataTimeFine = dataTimeInizio.plusMinuti(this.durata);
 		this.luogo=luogo;
 		this.nomePersona=nomePersona;
 	}
