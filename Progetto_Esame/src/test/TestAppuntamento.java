@@ -25,11 +25,6 @@ class TestAppuntamento {
 		assertFalse(ControlloDati.controlloData("31-04-2023"));
 		assertTrue(ControlloDati.controlloData("27-07-1998"));
 		assertTrue(ControlloDati.controlloOrario(orario));
-		assertTrue(ControlloDati.controlloDurata("01"));
-		assertTrue(ControlloDati.controlloDurata("02361"));
-		assertTrue(ControlloDati.controlloDurata("9999"));
-		assertFalse(ControlloDati.controlloDurata("10000"));
-		assertFalse(ControlloDati.controlloDurata("000000000"));
 		Appuntamento a1 = new Appuntamento("10-12-2021", "13-30", "30", "Milano", "Luca");
 		assertEquals("10-12-2021", a1.getData());
 		assertFalse(a1.matchPersona("Giacomo"));
@@ -48,6 +43,27 @@ class TestAppuntamento {
 		assertTrue(a1.isCompatible(a5));
 	}
 	
+	
+	@Test
+	void testControlloDurata() throws AppuntamentoException {
+		assertTrue(ControlloDati.controlloDurata("01"));
+		assertTrue(ControlloDati.controlloDurata("0000001111"));
+		assertTrue(ControlloDati.controlloDurata("1"));
+		assertTrue(ControlloDati.controlloDurata("1000"));
+		assertTrue(ControlloDati.controlloDurata("01000"));
+		assertTrue(ControlloDati.controlloDurata("02361"));
+		assertTrue(ControlloDati.controlloDurata("9999"));
+		assertTrue(ControlloDati.controlloDurata("09999"));
+		assertFalse(ControlloDati.controlloDurata("10000"));
+		assertFalse(ControlloDati.controlloDurata("0000018532"));
+		assertFalse(ControlloDati.controlloDurata("099999"));
+		assertFalse(ControlloDati.controlloDurata("000000000"));
+		
+		assertEquals("1111", new Appuntamento("10-12-2021", "23-30", "000001111", "Milano", "Luca").getDurata());
+		assertEquals("1000", new Appuntamento("10-12-2021", "23-30", "000001000", "Milano", "Luca").getDurata());
+		assertEquals("1001", new Appuntamento("10-12-2021", "23-30", "000001001", "Milano", "Luca").getDurata());
+	}
+	
 	@Test
 	void testMatchSingoloNome() throws AppuntamentoException {
 		assertTrue(new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca").matchPersona("LUCA"));
@@ -59,3 +75,4 @@ class TestAppuntamento {
 
 	}
 }
+
