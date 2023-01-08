@@ -8,10 +8,8 @@ package codice;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import codice.Appuntamento.ControlloDati.PatternMatcher;
+import jbook.util.PatternMatcher;
 
 public class Appuntamento {
 	private DataOrario dataTimeInizio;
@@ -23,28 +21,6 @@ public class Appuntamento {
 	public static class ControlloDati{
 		//regex con controllo data e orario
 		//Controllo.java
-		public static class PatternMatcher {
-			private Pattern pattern;
-			private Matcher matcher;
-			
-			//Sistematina a patternmatcher
-			public boolean matches() {
-				return matcher.matches();
-			}
-			
-			public static PatternMatcher create(String regex, String match, int ... flags) {
-				return new PatternMatcher(regex, match, flags);
-			}
-
-			private PatternMatcher(String regex, String match, int... flags) {
-				int resFlag = 0;
-				for (int i = 0; i < flags.length; i++)
-					resFlag |= flags[i];
-
-				pattern = Pattern.compile(regex, resFlag);
-				matcher = pattern.matcher(match);
-			}
-		}
 		
 		/**
 		 * 
@@ -116,7 +92,6 @@ public class Appuntamento {
 		this.nomePersona=nomePersona;
 	}
 	
-
 	public String getData() {
 		return dataTimeInizio.getDataToString();
 	}
@@ -132,7 +107,6 @@ public class Appuntamento {
 	public String getLuogo() {
 		return luogo;
 	}
-	
 	//Gli ho resi pubblici perché servono ad Agenda per ordinare gli appuntamenti per data
 	public DataOrario getDataTimeFine() {
 		return dataTimeFine;
@@ -148,32 +122,21 @@ public class Appuntamento {
 			  ControlloDati.controlloLuogo(luogo) &&
 			  ControlloDati.controlloDurata(durata)) )	throw new AppuntamentoException("Dati non validi!");
 	}
-
-	
-	//Compattato
 	public boolean matchPersona(String nome) {
 		return PatternMatcher.create(nome, this.nomePersona, Pattern.CASE_INSENSITIVE).matches();
 
 	}
-
 	public boolean matchData(String data) {
 		return this.getData().contains(data);
 	}
-	
 	public boolean matchDataOrario(String data, String orario) {
 		return (this.getData() + " " + this.getOrario()).contains(data + " " + orario);
 	}
-	
-	
-	/*
-	 * Ho "diviso" in due perché mi sembra più leggibile il codice così ... boh sostanzialemente non cambia nulla in realtà
-	 */
-	
+
 	public boolean isAfter(Appuntamento other) {
 		//Se inizio dopo che l'altro finisca, ritorno true
 		return (this.dataTimeInizio.compareTo(other.getDataTimeFine()) >= 0);
 	}
-	
 	public boolean isBefore(Appuntamento other) {
 		//Se finisco prima che l'altro inizi, ritorno true
 		return (this.dataTimeFine.compareTo(other.getDataTimeInizio()) <= 0);
@@ -182,5 +145,9 @@ public class Appuntamento {
 	//metto this almeno si capisce di più a cosa mi riferisco
 	public boolean isCompatible(Appuntamento other) {
 		return this.isAfter(other) || this.isBefore(other);
+	}
+	@Override
+	public String toString() {
+		return this.getData()+" "+this.getOrario()+" "+this.getDurata()+" "+this.getPersona()+" "+this.getLuogo();
 	}
 }
