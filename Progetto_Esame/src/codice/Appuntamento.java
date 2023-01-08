@@ -49,8 +49,7 @@ public class Appuntamento {
 					case CONTROLLO_NOME -> {
 						controllo = nome -> PatternMatcher.create("[a-z0-9]{1,20}(\\s)?[a-z0-9]{0,20}", nome, Pattern.CASE_INSENSITIVE).matches();
 						exception = new AppuntamentoException("Nome non valido!");
-					}
-									
+					}				
 				}
 			}
 			
