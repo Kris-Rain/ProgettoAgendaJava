@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import codice.Appuntamento;
 import codice.Appuntamento.ControlloDati;
+import codice.Appuntamento.ControlloDati.TipoControllo;
 import codice.AppuntamentoException;
 
 
@@ -19,12 +20,12 @@ class TestAppuntamento {
 	void testCostruttoreCompleto() throws AppuntamentoException {
 		String data = "10-12-2024";
 		String orario = "19-59";
-		assertTrue(ControlloDati.controlloData(data));
-		assertTrue(ControlloDati.controlloData("29-02-2024"));
-		assertFalse(ControlloDati.controlloData("29-02-2023"));
-		assertFalse(ControlloDati.controlloData("31-04-2023"));
-		assertTrue(ControlloDati.controlloData("27-07-1998"));
-		assertTrue(ControlloDati.controlloOrario(orario));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DATA, data));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DATA, "29-02-2024"));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DATA, "29-02-2023"));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DATA, "31-04-2023"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DATA, "27-07-1998"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_ORARIO, orario));
 		Appuntamento a1 = new Appuntamento("10-12-2021", "13-30", "30", "Milano", "Luca");
 		assertEquals("10-12-2021", a1.getData());
 		assertFalse(a1.matchPersona("Giacomo"));
@@ -45,23 +46,43 @@ class TestAppuntamento {
 	
 	
 	@Test
+	void testControlloOrario() {
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_ORARIO, "4567"));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_ORARIO, ""));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_ORARIO, "%&(3"));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_ORARIO, "111-21"));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_ORARIO, "13-255"));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_ORARIO, "12-60"));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_ORARIO, "24-00"));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_ORARIO, "orario"));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_ORARIO, "12:30"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_ORARIO, "12-30"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_ORARIO, "00-00"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_ORARIO, "03-45"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_ORARIO, "02-12"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_ORARIO, "09-59"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_ORARIO, "07-23"));
+	}
+	
+	@Test
 	void testControlloDurata() throws AppuntamentoException {
-		assertTrue(ControlloDati.controlloDurata("01"));
-		assertTrue(ControlloDati.controlloDurata("0000001111"));
-		assertTrue(ControlloDati.controlloDurata("1"));
-		assertTrue(ControlloDati.controlloDurata("1000"));
-		assertTrue(ControlloDati.controlloDurata("01000"));
-		assertTrue(ControlloDati.controlloDurata("02361"));
-		assertTrue(ControlloDati.controlloDurata("9999"));
-		assertTrue(ControlloDati.controlloDurata("09999"));
-		assertFalse(ControlloDati.controlloDurata("10000"));
-		assertFalse(ControlloDati.controlloDurata("0000018532"));
-		assertFalse(ControlloDati.controlloDurata("099999"));
-		assertFalse(ControlloDati.controlloDurata("000000000"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DURATA, "01"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DURATA, "0000001111"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DURATA, "1"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DURATA, "1000"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DURATA, "01000"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DURATA, "02361"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DURATA, "9999"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DURATA, "09999"));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DURATA, "10000"));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DURATA, "0000018532"));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DURATA, "099999"));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DURATA, "000000000"));
 		
 		assertEquals("1111", new Appuntamento("10-12-2021", "23-30", "000001111", "Milano", "Luca").getDurata());
 		assertEquals("1000", new Appuntamento("10-12-2021", "23-30", "000001000", "Milano", "Luca").getDurata());
 		assertEquals("1001", new Appuntamento("10-12-2021", "23-30", "000001001", "Milano", "Luca").getDurata());
+		
 	}
 	
 	@Test
