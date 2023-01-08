@@ -1,7 +1,11 @@
 package codice;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 //import java.util.Arrays;
@@ -67,19 +71,38 @@ public class Agenda implements Iterable<Appuntamento> {
 		this("Agenda " + (numAgende+1));
 	}
 	
-	public Agenda(FileReader file) {
+	public Agenda(File file) throws FileNotFoundException, IOException {
 		
-		try {
-			BufferedReader reader = new BufferedReader(file);
-			/*
-				https://www.digitalocean.com/community/tutorials/java-read-file-line-by-line
-				codice lettura da file
-			*/
-			reader.close();
+		nomeAgenda = file.getName();
+		appuntamenti = new ArrayList<>();
+		
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+
+		String stringaAppuntamento;
+		while((stringaAppuntamento = reader.readLine()) != null) {
+			String[] parametri = stringaAppuntamento.split(" ");
+			if(parametri.length == 5) {	//se i parametri non sono 5, ignoro la riga
+				try {
+					aggiungiAppuntamento(new Appuntamento(parametri[0], parametri[1], parametri[2], parametri[3], parametri[4]));	
+					//Provo ad aggiungere, aggiungiAppuntamento testa anche se compatibile.
+				} catch(AppuntamentoException e) {
+					//do nothing. Ignoro la riga
+				}	
+			}
 		}
-		catch(IOException e) {
-			e.printStackTrace();
-		}
+		reader.close();	
+		/* Nel peggiore dei casi, se non riesco a leggere nessuna riga, creo una Agenda vuota. 
+		 * Lancio un'eccezione solo se il file non esiste o ho avuto IOException
+		 */
+	}
+	
+	
+	public void salvaAgendaSuFile() throws FileNotFoundException, IOException {
+		File file = new File("/pathname/"+nomeAgenda);
+		file.createNewFile();
+		BufferedWriter br = new BufferedWriter(new FileWriter(file));
+		br.write(this.toString());
+		br.close();
 		
 	}
 
@@ -158,7 +181,7 @@ public class Agenda implements Iterable<Appuntamento> {
 	@Override
 	public String toString() {
 		String stringaAppuntamenti = "";
-		for(Appuntamento appointment: this) stringaAppuntamenti+= appointment.toString();
+		for(Appuntamento appointment: this) stringaAppuntamenti+= appointment.toString() + "\n";
 		return stringaAppuntamenti;
 	}
 
@@ -231,8 +254,5 @@ public class Agenda implements Iterable<Appuntamento> {
 		return new IteratoreAgenda();
 	}
 	
-	public void salvaAgendaSuFile() {
-		/* Codice scrittura su file */
-	}
 	
 }
