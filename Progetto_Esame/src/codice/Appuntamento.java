@@ -144,7 +144,7 @@ public class Appuntamento {
 			String[] parametri = { data, orario, durata, luogo, nome };
 			int indice = 0;
 			for(Map.Entry<TipoControllo, ControlloMappato> set: controlliMappati.entrySet()) {
-				if(set.getValue().test(parametri[indice++])) throw set.getValue().getAppuntamentoException();
+				if(!set.getValue().test(parametri[indice++])) throw set.getValue().getAppuntamentoException();
 			}
 		}
 		/*
