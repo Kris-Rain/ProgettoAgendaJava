@@ -8,6 +8,12 @@ package codice;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import jbook.util.PatternMatcher;
 
@@ -19,8 +25,60 @@ public class Appuntamento {
 	private String nomePersona;
 	
 	public static class ControlloDati{
+		
+		
+		public class ControlloMappato {
+			String regex;
+			Predicate<String> predicato;
+			AppuntamentoException exception;
+			
+			public ControlloMappato(TipoControllo tc) {
+				switch(tc) {
+					case CONTROLLO_DATA -> {
+						predicato = ControlloDati::isDataValida;
+						exception = new AppuntamentoException("Data non valida!");
+					}
+					case CONTROLLO_ORARIO -> {
+						predicato = ControlloDati::isOrarioValido;
+						exception = new AppuntamentoException("Orario non valido!");
+					}
+					case CONTROLLO_DURATA -> {
+						regex = "(0*[1-9][0-9]{0,3})";
+						exception = new AppuntamentoException("Durata non valida!");
+					}
+					case CONTROLLO_LUOGO -> {
+						regex = "[a-z_]{1,20}";
+						exception = new AppuntamentoException("Luogo non valido!");
+					}
+					case CONTROLLO_NOME -> {
+						regex = "[a-z0-9]{1,20}(\\s)?[a-z0-9]{0,20}";
+						exception = new AppuntamentoException("Nome non valido!");
+					}
+									
+				}
+			}
+			
+		}
+		
+		public enum TipoControllo {
+			CONTROLLO_DATA,
+			CONTROLLO_ORARIO,
+			CONTROLLO_DURATA,
+			CONTROLLO_LUOGO,
+			CONTROLLO_NOME
+		}
+		
+		
+		private static HashMap<TipoControllo, ControlloMappato> controlliMappati = new HashMap<>();
+		
+		private static void creaHashRegex() {
+			for(T)
+			regex.putIfAbsent(TipoControllo.CONTROLLO_DURATA, "(0*[1-9][0-9]{0,3})");
+			regex.putIfAbsent(TipoControllo.CONTROLLO_LUOGO, "[a-z_]{1,20}");
+			regex.putIfAbsent(TipoControllo.CONTROLLO_NOME, "[a-z0-9]{1,20}(\\s)?[a-z0-9]{0,20}");
+		}
 		//regex con controllo data e orario
-		//Controllo.java
+		//Controllo.java	
 		
 		/**
 		 * 
@@ -49,9 +107,9 @@ public class Appuntamento {
 		 * 
 		 */
 		
-		private static boolean isDataValida(String data){
+		private static boolean isDataTimeValid(String format, String dataTime){
 			try {
-				DateTimeFormatter.ofPattern("dd-MM-uuuu").withResolverStyle(ResolverStyle.STRICT).parse(data);
+				DateTimeFormatter.ofPattern(format).withResolverStyle(ResolverStyle.STRICT).parse(dataTime);
 			}
 			catch(DateTimeParseException e) {
 				return false;
@@ -59,13 +117,24 @@ public class Appuntamento {
 			return true;
 		}
 		
-		private static boolean controlloGenerico(String regex, String match, int ... flags){
-			return PatternMatcher.create(regex, match, flags).matches();
+		
+		private static boolean isDataValida(String data) {
+			return isDataTimeValid("dd-MM-uuuu", data);
 		}
 		
+		private static boolean isOrarioValido(String orario) {
+			return isDataTimeValid("HH-mm", orario);
+		}
+				
+		
+		public static boolean controlloPer(TipoControllo tc, String stringa) {
+			creaHashRegex();
+			return (tc == TipoControllo.CONTROLLO_DATA) ? isDataValida(stringa) : (tc == TipoControllo.CONTROLLO_ORARIO) ?
+					isOrarioValido(stringa) : PatternMatcher.create(regex.get(tc), stringa, Pattern.CASE_INSENSITIVE).matches();
+		}
+		/*
 		public static boolean controlloData(String data){
-			if(!controlloGenerico("([0-2][0-9]|(3)[0-1])-(((0)[0-9])|((1)[0-2]))-\\d{4}", data)) return false;
-			return isDataValida(data);
+			return(controlloGenerico("([0-2][0-9]|(3)[0-1])-(((0)[0-9])|((1)[0-2]))-\\d{4}", data) && isDataValida(data));
 		}
 		public static boolean controlloOrario(String orario){
 			return controlloGenerico("([0-1][0-9]|(2)[0-3])-([0-5][0-9])", orario);
@@ -76,14 +145,15 @@ public class Appuntamento {
 			return controlloGenerico("(0*[1-9][0-9]{0,3})", durata);
 		}
 		public static boolean controlloNome(String nome){
-			return controlloGenerico("[a-z0-9]{1,20}", nome, Pattern.CASE_INSENSITIVE);
+			return controlloGenerico("[a-z0-9]{1,20}(\\s)?[a-z0-9]{0,20}", nome, Pattern.CASE_INSENSITIVE);
 		}
 		public static boolean controlloLuogo(String luogo){
-			return controlloGenerico("[a-z]{1,20}", luogo, Pattern.CASE_INSENSITIVE);
+			return controlloGenerico("[a-z_]{1,20}", luogo, Pattern.CASE_INSENSITIVE);
 		}
+		*/
 	}
 	
-	public Appuntamento(String data, String orario, String durata, String luogo, String nomePersona) throws AppuntamentoException{
+	public Appuntamento(String data, String orario, String durata, String luogo, String nomePersona) throws AppuntamentoException {
 		testParametri(data, orario, durata, luogo, nomePersona);
 		this.dataTimeInizio = new DataOrario(data, orario);
 		this.durata=durata.replaceFirst("^0*", "");
@@ -91,7 +161,8 @@ public class Appuntamento {
 		this.luogo=luogo;
 		this.nomePersona=nomePersona;
 	}
-	
+		
+
 	public String getData() {
 		return dataTimeInizio.getDataToString();
 	}
@@ -107,6 +178,7 @@ public class Appuntamento {
 	public String getLuogo() {
 		return luogo;
 	}
+	
 	//Gli ho resi pubblici perché servono ad Agenda per ordinare gli appuntamenti per data
 	public DataOrario getDataTimeFine() {
 		return dataTimeFine;
@@ -115,28 +187,63 @@ public class Appuntamento {
 		return dataTimeInizio;
 	}
 
-	private void testParametri(String data, String orario, String durata, String luogo, String nomePersona) throws AppuntamentoException {
-		if( !(ControlloDati.controlloData(data) &&
-			  ControlloDati.controlloOrario(orario) &&
-			  ControlloDati.controlloNome(nomePersona) &&
-			  ControlloDati.controlloLuogo(luogo) &&
-			  ControlloDati.controlloDurata(durata)) )	throw new AppuntamentoException("Dati non validi!");
+	/*
+	public HashMap<Predicate<String>, Supplier<AppuntamentoException>> creaHashControlli() {
+		HashMap<Predicate<String>, Supplier<AppuntamentoException>> controlli = new HashMap<>();
+		controlli.putIfAbsent(data -> ControlloDati.controlloData(data), () -> new AppuntamentoException("Data non valida!"));
+		controlli.putIfAbsent(orario -> ControlloDati.controlloOrario(orario), () -> new AppuntamentoException("Orario non valido!"));
+		controlli.putIfAbsent(durata -> ControlloDati.controlloDurata(durata), () -> new AppuntamentoException("Durata non valida!"));
+		controlli.putIfAbsent(luogo -> ControlloDati.controlloLuogo(luogo), () -> new AppuntamentoException("Luogo non valido!"));
+		controlli.putIfAbsent(nome -> ControlloDati.controlloNome(nome), () -> new AppuntamentoException("Nome non valido!"));
+		return controlli;
 	}
+	
+	private void testParametri(String data, String orario, String durata, String luogo, String nomePersona) throws AppuntamentoException {
+		HashMap<Predicate<String>, Supplier<AppuntamentoException>> controlli = creaHashControlli();
+		ArrayList<String> parametri = new ArrayList<>(Arrays.asList(data, orario, durata, luogo, nomePersona));
+		parametri.stream().for
+		for(Map.Entry<Predicate<String>, Supplier<AppuntamentoException>> set: controlli.entrySet()) {
+			parametri.stream()
+		}
+	}
+	*/
+	
+	private void hashMapControlli(String data, String orario, String durata, String luogo, String nomePersona) throws AppuntamentoException {
+        HashMap<Boolean, AppuntamentoException> hashMap=new HashMap<>();
+        hashMap.putIfAbsent(ControlloDati.controlloData(data), new AppuntamentoException("Data non valida!"));
+        hashMap.putIfAbsent(ControlloDati.controlloOrario(orario), new AppuntamentoException("Orario non valido!"));
+        hashMap.putIfAbsent(ControlloDati.controlloDurata(durata), new AppuntamentoException("Durata non valida!"));
+        hashMap.putIfAbsent(ControlloDati.controlloLuogo(luogo), new AppuntamentoException("Luogo non valido!"));
+        hashMap.putIfAbsent(ControlloDati.controlloNome(nomePersona), new AppuntamentoException("Nome non valido!"));
+        for(Map.Entry<Boolean, AppuntamentoException> set:hashMap.entrySet()) {
+            if(!set.getKey()) throw set.getValue();
+        }
+    }
+	
+	//Compattato
 	public boolean matchPersona(String nome) {
 		return PatternMatcher.create(nome, this.nomePersona, Pattern.CASE_INSENSITIVE).matches();
 
 	}
+
 	public boolean matchData(String data) {
 		return this.getData().contains(data);
 	}
+	
 	public boolean matchDataOrario(String data, String orario) {
 		return (this.getData() + " " + this.getOrario()).contains(data + " " + orario);
 	}
-
+	
+	
+	/*
+	 * Ho "diviso" in due perché mi sembra più leggibile il codice così ... boh sostanzialemente non cambia nulla in realtà
+	 */
+	
 	public boolean isAfter(Appuntamento other) {
 		//Se inizio dopo che l'altro finisca, ritorno true
 		return (this.dataTimeInizio.compareTo(other.getDataTimeFine()) >= 0);
 	}
+	
 	public boolean isBefore(Appuntamento other) {
 		//Se finisco prima che l'altro inizi, ritorno true
 		return (this.dataTimeFine.compareTo(other.getDataTimeInizio()) <= 0);
@@ -146,8 +253,10 @@ public class Appuntamento {
 	public boolean isCompatible(Appuntamento other) {
 		return this.isAfter(other) || this.isBefore(other);
 	}
+	
 	@Override
 	public String toString() {
-		return this.getData()+" "+this.getOrario()+" "+this.getDurata()+" "+this.getPersona()+" "+this.getLuogo();
+		return this.getData()+" "+this.getOrario()+" "+this.getDurata()+" "+this.getLuogo()+" "+this.getPersona()+"\n";
 	}
+	
 }
