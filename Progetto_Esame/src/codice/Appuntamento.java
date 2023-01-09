@@ -9,7 +9,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import jbook.util.PatternMatcher;
@@ -43,7 +42,7 @@ public class Appuntamento {
 						exception = new AppuntamentoException("Durata non valida!");
 					}
 					case CONTROLLO_LUOGO -> {
-						controllo = luogo -> PatternMatcher.create("[a-z_]{1,20}", luogo, Pattern.CASE_INSENSITIVE).matches();
+						controllo = luogo -> PatternMatcher.create("[a-z0-9]{1,20}(\\s)?[a-z0-9]{0,20}", luogo, Pattern.CASE_INSENSITIVE).matches();
 						exception = new AppuntamentoException("Luogo non valido!");
 					}
 					case CONTROLLO_NOME -> {
@@ -142,8 +141,8 @@ public class Appuntamento {
 			HashMap<TipoControllo, ControlloMappato> controlliMappati = creaControlliMappati();
 			String[] parametri = { data, orario, durata, luogo, nome };
 			int indice = 0;
-			for(Map.Entry<TipoControllo, ControlloMappato> set: controlliMappati.entrySet()) {
-				if(!set.getValue().test(parametri[indice++])) throw set.getValue().getAppuntamentoException();
+			for(TipoControllo controllo: TipoControllo.values()) {
+				if(!controlliMappati.get(controllo).test(parametri[indice++])) throw controlliMappati.get(controllo).getAppuntamentoException();
 			}
 		}
 		/*
