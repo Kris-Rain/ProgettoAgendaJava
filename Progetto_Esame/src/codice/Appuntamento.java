@@ -42,7 +42,7 @@ public class Appuntamento {
 						exception = new AppuntamentoException("Durata non valida!");
 					}
 					case CONTROLLO_LUOGO -> {
-						controllo = luogo -> PatternMatcher.create("[a-z0-9]{1,20}(\\s)?[a-z0-9]{0,20}", luogo, Pattern.CASE_INSENSITIVE).matches();
+						controllo = luogo -> PatternMatcher.create("[a-z]{1,20}(\\s)?[a-z]{0,20}", luogo, Pattern.CASE_INSENSITIVE).matches();
 						exception = new AppuntamentoException("Luogo non valido!");
 					}
 					case CONTROLLO_NOME -> {
