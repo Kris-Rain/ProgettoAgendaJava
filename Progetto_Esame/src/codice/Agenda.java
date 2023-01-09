@@ -30,8 +30,6 @@ public class Agenda implements Iterable<Appuntamento> {
 	private String nomeAgenda;
 	private ArrayList<Appuntamento> appuntamenti;
 	
-	private static int numAgende = 0;
-	
 	
 	public class IteratoreAgenda implements Iterator<Appuntamento> {
 		private int indiceContatti;
@@ -56,10 +54,9 @@ public class Agenda implements Iterable<Appuntamento> {
 	
 	
 	public Agenda(String nomeAgenda, ArrayList<Appuntamento> appuntamenti) {
-		this.nomeAgenda = nomeAgenda;
-		this.appuntamenti = appuntamenti;
+		this.nomeAgenda = (nomeAgenda.isEmpty()) ? "Agenda": nomeAgenda;
+		this.appuntamenti = (isAgenda(appuntamenti)) ? appuntamenti : new ArrayList<>();
 		ordinaAppuntamenti();
-		numAgende++;
 	}
 	
 	public Agenda(String nomeAgenda) {
@@ -68,9 +65,10 @@ public class Agenda implements Iterable<Appuntamento> {
 	
 	
 	public Agenda() {
-		this("Agenda " + (numAgende+1));
+		this("Agenda");
 	}
 	
+
 	public Agenda(File file) throws FileNotFoundException, IOException {
 		
 		nomeAgenda = file.getName();
@@ -105,6 +103,14 @@ public class Agenda implements Iterable<Appuntamento> {
 		br.close();
 		
 	}
+	
+	public static boolean isAgenda(ArrayList<Appuntamento> appuntamenti) {
+		appuntamenti.sort( (first, second) -> first.getDataTimeInizio().compareTo(second.getDataTimeInizio()));
+		for(int i = 0; i < appuntamenti.size() - 1; i++) {
+			if(!appuntamenti.get(i).isBefore(appuntamenti.get(i+1))) return false;
+		}
+		return true;
+	}
 
 	public String getNomeAgenda() {
 		return nomeAgenda;
@@ -117,15 +123,11 @@ public class Agenda implements Iterable<Appuntamento> {
 	public ArrayList<Appuntamento> getAppuntamenti() {
 		return appuntamenti;
 	}
+	
+	public int getDimensioneAgenda() {
+		return appuntamenti.size();
+	}
 
-	public static int getNumAgende() {
-		return numAgende;
-	}
-	
-	
-	public static void clear() {
-		numAgende = 0;
-	}
 	
 	private ArrayList<Appuntamento> searchAppuntamentoGenerico(Predicate <Appuntamento> predicato) {
 		return (ArrayList<Appuntamento>) appuntamenti.stream().filter(predicato).collect(Collectors.toList());
@@ -139,7 +141,7 @@ public class Agenda implements Iterable<Appuntamento> {
 		return searchAppuntamentoGenerico( appuntamento -> appuntamento.matchData(data));
 	}
 	
-	private ArrayList<Appuntamento> searchAppuntamentoPerDataOrario(String data, String orario) {
+	public ArrayList<Appuntamento> searchAppuntamentoPerDataOrario(String data, String orario) {
 		return searchAppuntamentoGenerico( appuntamento -> appuntamento.matchDataOrario(data, orario));
 	}
 	
@@ -174,14 +176,14 @@ public class Agenda implements Iterable<Appuntamento> {
 	 * so sta cosa perché l'aveva detto Guazzone a lezione di algoritmi
 	 */
 	
-	public void ordinaAppuntamenti() {
+	private void ordinaAppuntamenti() {
 		appuntamenti.sort( (first, second) -> first.getDataTimeInizio().compareTo(second.getDataTimeInizio()));
 	}
 	
 	@Override
 	public String toString() {
 		String stringaAppuntamenti = "";
-		for(Appuntamento appointment: this) stringaAppuntamenti+= appointment.toString() + "\n";
+		for(Appuntamento appointment: this) stringaAppuntamenti+= appointment.toString();
 		return stringaAppuntamenti;
 	}
 
