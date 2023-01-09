@@ -64,6 +64,20 @@ class TestAppuntamento {
 		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_ORARIO, "07-23"));
 	}
 	
+	
+	@Test
+	void testControlloNome() {
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, "  "));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, " "));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, ""));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, "$(!$)!"));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, "NomeTroppoLungoLungoooo CognomeTroppoLungoLungo"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, "Luca"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, "Paolo Bonolis"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, "Luca98 Bianchi"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, "MARCO"));
+	}
+	
 	@Test
 	void testControlloDurata() throws AppuntamentoException {
 		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DURATA, "01"));
