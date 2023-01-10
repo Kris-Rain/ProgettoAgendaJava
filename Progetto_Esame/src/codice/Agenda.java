@@ -68,6 +68,10 @@ public class Agenda implements Iterable<Appuntamento> {
 		this("Agenda");
 	}
 	
+	public Agenda(ArrayList<Appuntamento> appuntamenti) {
+		this("Agenda", appuntamenti);
+	}
+	
 
 	public Agenda(File file) throws FileNotFoundException, IOException {
 		
@@ -78,7 +82,7 @@ public class Agenda implements Iterable<Appuntamento> {
 
 		String stringaAppuntamento;
 		while((stringaAppuntamento = reader.readLine()) != null) {
-			String[] parametri = stringaAppuntamento.split(" ");
+			String[] parametri = stringaAppuntamento.split("(\\s)+");
 			if(parametri.length == 5) {	//se i parametri non sono 5, ignoro la riga
 				try {
 					aggiungiAppuntamento(new Appuntamento(parametri[0], parametri[1], parametri[2], parametri[3], parametri[4]));	
@@ -180,12 +184,27 @@ public class Agenda implements Iterable<Appuntamento> {
 		appuntamenti.sort( (first, second) -> first.getDataTimeInizio().compareTo(second.getDataTimeInizio()));
 	}
 	
-	@Override
-	public String toString() {
+	private String elencaAppuntamenti(ArrayList<Appuntamento> lista) {
 		String stringaAppuntamenti = "";
-		for(Appuntamento appointment: this) stringaAppuntamenti+= appointment.toString();
+		for(Appuntamento appointment: lista) stringaAppuntamenti+= appointment.toString();
 		return stringaAppuntamenti;
 	}
+	
+	@Override
+	public String toString() {
+		return "Agenda: " + nomeAgenda + "\n" + elencaAppuntamenti(appuntamenti);
+	}
+	
+	
+	public String elencaPerPersona(String nome) {
+		return elencaAppuntamenti(searchAppuntamentoPerPersona(nome));
+	}
+	
+	
+	public String elencaPerData(String data) {
+		return elencaAppuntamenti(searchAppuntamentoPerData(data));
+	}
+	
 
 	public boolean aggiungiAppuntamento(Appuntamento appointment) {
 		if(!this.isCompatible(appointment)) return false;
@@ -212,9 +231,9 @@ public class Agenda implements Iterable<Appuntamento> {
 	}
 	
 
-	public boolean modificaAppuntamento(String dataApp, String orarioApp, String parametroDaModificare, String newValue) {
+	public int modificaAppuntamento(String dataApp, String orarioApp, String parametroDaModificare, String newValue) {
 		ArrayList<Appuntamento> risultato = searchAppuntamentoPerDataOrario(dataApp, orarioApp);
-		if(risultato.isEmpty()) return false;
+		if(risultato.isEmpty()) return 0;
 		Appuntamento vecchioAppuntamento = risultato.get(0);
 		
 		String[] parametri = {
@@ -227,26 +246,26 @@ public class Agenda implements Iterable<Appuntamento> {
 
 
 		switch(parametroDaModificare.toLowerCase().strip()) {
-			case "data": parametri[0] = newValue; break;
-			case "orario": parametri[1] = newValue; break;
-			case "durata": parametri[2] = newValue; break;
-			case "luogo": parametri[3] = newValue; break;
-			case "persona": parametri[4] = newValue; break;
-			default: return false;
+			case "data" -> parametri[0] = newValue;
+			case "orario" -> parametri[1] = newValue; 
+			case "durata" -> parametri[2] = newValue; 
+			case "luogo" -> parametri[3] = newValue; 
+			case "persona" -> parametri[4] = newValue; 
+			default -> { return -2; }
 		}
 
 		
 		try {
 			Appuntamento nuovoAppuntamento = new Appuntamento(parametri[0], parametri[1], parametri[2], parametri[3], parametri[4]);
-			if(!this.isCompatible(nuovoAppuntamento)) return false;
+			if(!this.isCompatible(nuovoAppuntamento)) return -1;
 			appuntamenti.set(appuntamenti.indexOf(vecchioAppuntamento), nuovoAppuntamento);
 			ordinaAppuntamenti();
 		} 
 		catch(AppuntamentoException e) {
-			return false;
+			return -1;
 		}
 		
-		return true;
+		return 1;
 	}
 	
 	
@@ -254,6 +273,12 @@ public class Agenda implements Iterable<Appuntamento> {
 	@Override
 	public Iterator<Appuntamento> iterator() {
 		return new IteratoreAgenda();
+	}
+	
+	
+	@Override
+	public Agenda clone() {
+		return new Agenda(nomeAgenda, appuntamenti);
 	}
 	
 	
