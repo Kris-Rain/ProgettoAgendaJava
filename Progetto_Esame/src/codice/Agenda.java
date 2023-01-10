@@ -14,8 +14,6 @@ import java.util.Iterator;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-
-
 /**
  * 
  * @author Nicolò Bianchetto
@@ -132,7 +130,6 @@ public class Agenda implements Iterable<Appuntamento> {
 		return appuntamenti.size();
 	}
 
-	
 	private ArrayList<Appuntamento> searchAppuntamentoGenerico(Predicate <Appuntamento> predicato) {
 		return (ArrayList<Appuntamento>) appuntamenti.stream().filter(predicato).collect(Collectors.toList());
 	}
@@ -161,6 +158,13 @@ public class Agenda implements Iterable<Appuntamento> {
 	public boolean isCompatible(Appuntamento appointment) {
 		for(Appuntamento elemento: this) {
 			if(!appointment.isCompatible(elemento))	return false;
+		}
+		return true;
+	}
+	
+	public boolean isDataTimeCompatible(DataOrario dataTime) {
+		for(Appuntamento elemento: this) {
+			if(!elemento.isDataTimeCompatible(dataTime)) return false;
 		}
 		return true;
 	}
@@ -200,19 +204,16 @@ public class Agenda implements Iterable<Appuntamento> {
 		return elencaAppuntamenti(searchAppuntamentoPerPersona(nome));
 	}
 	
-	
 	public String elencaPerData(String data) {
 		return elencaAppuntamenti(searchAppuntamentoPerData(data));
 	}
 	
-
 	public boolean aggiungiAppuntamento(Appuntamento appointment) {
 		if(!this.isCompatible(appointment)) return false;
 		appuntamenti.add(appointment);
 		ordinaAppuntamenti();
 		return true;
 	}
-	
 	
 	public boolean aggiungiAppuntamento(String data, String orario, String durata, String luogo, String nomePersona) throws AppuntamentoException {
 		return aggiungiAppuntamento(new Appuntamento(data, orario, durata, luogo, nomePersona));
@@ -229,7 +230,6 @@ public class Agenda implements Iterable<Appuntamento> {
 	public boolean rimuoviPerDataOrario(String data, String orario) {
 		return appuntamenti.removeAll(searchAppuntamentoPerDataOrario(data, orario));
 	}
-	
 
 	public int modificaAppuntamento(String dataApp, String orarioApp, String parametroDaModificare, String newValue) {
 		ArrayList<Appuntamento> risultato = searchAppuntamentoPerDataOrario(dataApp, orarioApp);
@@ -244,8 +244,7 @@ public class Agenda implements Iterable<Appuntamento> {
 				vecchioAppuntamento.getPersona()
 		};
 
-
-		switch(parametroDaModificare.toLowerCase().strip()) {
+		/*switch(parametroDaModificare.toLowerCase().strip()) {
 			case "data" -> parametri[0] = newValue;
 			case "orario" -> parametri[1] = newValue; 
 			case "durata" -> parametri[2] = newValue; 
@@ -253,7 +252,6 @@ public class Agenda implements Iterable<Appuntamento> {
 			case "persona" -> parametri[4] = newValue; 
 			default -> { return -2; }
 		}
-
 		
 		try {
 			Appuntamento nuovoAppuntamento = new Appuntamento(parametri[0], parametri[1], parametri[2], parametri[3], parametri[4]);
@@ -263,6 +261,19 @@ public class Agenda implements Iterable<Appuntamento> {
 		} 
 		catch(AppuntamentoException e) {
 			return -1;
+		}*/
+		
+		switch(parametroDaModificare.toLowerCase().strip()) {
+			case "data" -> {
+				if(isDataTimeCompatible(new DataOrario(newValue, parametri[1]))) vecchioAppuntamento.setData(newValue);
+			}
+			case "orario" -> isDataTimeCompatible(new DataOrario(parametri[0], newValue));
+			case "durata" -> isDataTimeCompatible(new DataOrario(parametri[0], parametri[1]).plusMinuti(newValue));
+			case "luogo" -> parametri[3] = newValue;
+			case "persona" -> parametri[4] = newValue;
+			default -> { return -2; }
+		
+		
 		}
 		
 		return 1;
