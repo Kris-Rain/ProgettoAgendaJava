@@ -1,4 +1,5 @@
 
+
 /**
  * @author Kristian Rigo
  * @author Nicolò Bianchetto
@@ -13,37 +14,32 @@ import codice.Appuntamento.ControlloDati;
 import codice.Appuntamento.ControlloDati.TipoControllo;
 import codice.AppuntamentoException;
 
-
 class TestAppuntamento {
 
 	@Test
 	void testCostruttoreCompleto() throws AppuntamentoException {
-		String data = "10-12-2024";
-		String orario = "19-59";
-		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DATA, data));
-		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DATA, "29-02-2024"));
-		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DATA, "29-02-2023"));
-		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DATA, "31-04-2023"));
-		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DATA, "27-07-1998"));
-		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_ORARIO, orario));
+		assertDoesNotThrow(() -> new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca"));
+		assertDoesNotThrow(() -> new Appuntamento("05-08-1997", "20-30", "15", "Via Novara 2", "Marco Rossi"));
+		assertDoesNotThrow(() -> new Appuntamento("28-06-2430", "15-00", "60", "New York", "John"));
+		assertThrows(AppuntamentoException.class, () -> new Appuntamento("08/05-2023", "23-30", "30", "Milano", "Luca"));
+		assertThrows(AppuntamentoException.class, () -> new Appuntamento("10-12-2021", "23/30", "001", "Milano", "Luca"));
+		assertThrows(AppuntamentoException.class, () -> new Appuntamento("10-12-2021", "23-30", "30", "Milano", "999"));
+
 		Appuntamento a1 = new Appuntamento("10-12-2021", "13-30", "30", "Milano", "Luca");
 		assertEquals("10-12-2021", a1.getData());
+		assertEquals("13-30", a1.getOrario());
+		assertEquals("30", a1.getDurata());
+		assertEquals("Milano", a1.getLuogo());
+		assertEquals("Luca", a1.getPersona());
+		assertTrue(a1.matchPersona("Luca"));
 		assertFalse(a1.matchPersona("Giacomo"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DATA, a1.getData()));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_ORARIO, a1.getOrario()));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DURATA, a1.getDurata()));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_LUOGO, a1.getLuogo()));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, a1.getPersona()));
+
 	}
-	
-	@Test
-	void testIsCompatible() throws AppuntamentoException {
-		Appuntamento a1 = new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca");
-		Appuntamento a2 = new Appuntamento("10-12-2021", "23-45", "30", "Milano", "Luca");
-		Appuntamento a3 = new Appuntamento("11-12-2021", "13-30", "30", "Milano", "Luca");
-		Appuntamento a4 = new Appuntamento("10-12-2021", "14-00", "30", "Milano", "Luca");
-		Appuntamento a5 = new Appuntamento("10-12-2021", "13-45", "30", "Milano", "Luca");
-		assertFalse(a1.isCompatible(a2));
-		assertTrue(a1.isCompatible(a3));
-		assertTrue(a1.isCompatible(a4));
-		assertTrue(a1.isCompatible(a5));
-	}
-	
 	
 	@Test
 	void testControlloOrario() {
@@ -64,7 +60,6 @@ class TestAppuntamento {
 		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_ORARIO, "07-23"));
 	}
 	
-	
 	@Test
 	void testControlloNome() {
 		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, "  "));
@@ -80,7 +75,6 @@ class TestAppuntamento {
 		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, "MARCO"));
 		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, "Giovanni1234"));
 	}
-	
 	
 	@Test
 	void testControlloLuogo() {
@@ -122,6 +116,21 @@ class TestAppuntamento {
 	}
 	
 	@Test
+	void testControlloData() throws AppuntamentoException{
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DATA, "25-12-2023"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DATA, "29-02-2020"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DATA, "29-02-2024"));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DATA, " "));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DATA, ""));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DATA, "25/12/2022"));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DATA, "30-02-2021"));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DATA, "40-05-2023"));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DATA, "00-00-0000"));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DATA, "2020-02-12"));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DATA, "08-31-2023"));
+	}
+	
+	@Test
 	void testMatchSingoloNome() throws AppuntamentoException {
 		assertTrue(new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca").matchPersona("LUCA"));
 		assertTrue(new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca").matchPersona("luca"));
@@ -129,7 +138,65 @@ class TestAppuntamento {
 		assertTrue(new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca").matchPersona("lUca"));
 		assertTrue(new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca").matchPersona("luCA"));
 		assertTrue(new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca").matchPersona("LUca"));
-
+		assertFalse(new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca").matchPersona("Marco"));
+		assertFalse(new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca").matchPersona(" "));
+		assertFalse(new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca").matchPersona(""));
+	}
+	
+	@Test
+	void testMatchData() throws AppuntamentoException {
+		assertTrue(new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca").matchData("10-12-2021"));
+		assertFalse(new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca").matchData("2021-10-12"));
+		assertFalse(new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca").matchData("12-10-2021"));
+		assertFalse(new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca").matchData("10/12/2021"));
+		assertFalse(new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca").matchData(""));
+		assertFalse(new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca").matchData(" "));
+	}
+	
+	@Test
+	void testMatchDataOrario() throws AppuntamentoException {
+		assertTrue(new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca").matchDataOrario("10-12-2021", "23-30"));
+		assertFalse(new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca").matchDataOrario("2021-10-12", "23-30"));
+		assertFalse(new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca").matchDataOrario("12-10-2021", "23-30"));
+		assertFalse(new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca").matchDataOrario("10/12/2021", "23-30"));
+		assertFalse(new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca").matchDataOrario("10-12-2021", "23:30"));
+		assertFalse(new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca").matchDataOrario("12-10-2021", "23/30"));
+		assertFalse(new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca").matchDataOrario("12-10-2021", "13-00"));
+		assertFalse(new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca").matchDataOrario("", ""));
+		assertFalse(new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca").matchDataOrario(" ", " "));
+		assertFalse(new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca").matchDataOrario(" ", "23-30"));
+		assertFalse(new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca").matchDataOrario("10-12-2021", " "));
+	}
+	
+	@Test
+	void testIsCompatible() throws AppuntamentoException {
+		Appuntamento a1 = new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca");
+		Appuntamento a2 = new Appuntamento("10-12-2021", "23-45", "30", "Milano", "Luca");
+		Appuntamento a3 = new Appuntamento("11-12-2021", "13-30", "30", "Milano", "Luca");
+		Appuntamento a4 = new Appuntamento("10-12-2021", "14-00", "30", "Milano", "Luca");
+		Appuntamento a5 = new Appuntamento("10-12-2021", "13-45", "30", "Milano", "Luca");
+		assertFalse(a1.isCompatible(a2));
+		assertTrue(a1.isCompatible(a3));
+		assertTrue(a1.isCompatible(a4));
+		assertTrue(a1.isCompatible(a5));
+	}
+	
+	@Test
+	void testIsDataTimeCompatible() throws AppuntamentoException {
+		Appuntamento a1 = new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca");
+		Appuntamento a2 = new Appuntamento("10-12-2021", "23-45", "30", "Milano", "Luca");
+		Appuntamento a3 = new Appuntamento("11-12-2021", "13-30", "30", "Milano", "Luca");
+		Appuntamento a4 = new Appuntamento("10-12-2021", "14-00", "30", "Milano", "Luca");
+		Appuntamento a5 = new Appuntamento("10-12-2021", "13-45", "30", "Milano", "Luca");
+		assertFalse(a1.isDataTimeCompatible(a2.getDataTimeInizio()));
+		assertTrue(a1.isDataTimeCompatible(a3.getDataTimeInizio()));
+		assertTrue(a1.isDataTimeCompatible(a4.getDataTimeInizio()));
+		assertTrue(a1.isDataTimeCompatible(a5.getDataTimeInizio()));
+	}
+	
+	@Test
+	void testToString() throws AppuntamentoException {
+		Appuntamento a1 = new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca");
+		assertEquals("10-12-2021 23-30 30 Milano Luca\n", a1.toString());
 	}
 }
-
