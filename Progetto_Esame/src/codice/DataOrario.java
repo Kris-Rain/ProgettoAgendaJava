@@ -36,13 +36,7 @@ public class DataOrario {
 	}
 	
 	public String getOrarioToString() {
-		return orario.toString();
-	}
-	
-	public void addTempoMinuti(String durata) {
-		LocalDateTime ldt = data.atTime(orario).plusMinutes(Long.parseLong(durata));
-		data = ldt.toLocalDate();
-		orario = ldt.toLocalTime();
+		return orario.format(formatterTime);
 	}
 	
 	public DataOrario plusMinuti(String durata) {
