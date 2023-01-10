@@ -72,10 +72,32 @@ class TestAppuntamento {
 		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, ""));
 		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, "$(!$)!"));
 		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, "NomeTroppoLungoLungoooo CognomeTroppoLungoLungo"));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, "1234"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, "A"));
 		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, "Luca"));
 		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, "Paolo Bonolis"));
 		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, "Luca98 Bianchi"));
 		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, "MARCO"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, "Giovanni1234"));
+	}
+	
+	
+	@Test
+	void testControlloLuogo() {
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_LUOGO, ""));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_LUOGO, " "));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_LUOGO, "1245"));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_LUOGO, "!($(%"));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_LUOGO, "Aereo123"));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_LUOGO, "Aereo!!!"));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_LUOGO, "DescrizioneLuogo DecisamenteTroppoLunga"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_LUOGO, "A"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_LUOGO, "Ufficio"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_LUOGO, "Via Roma 36"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_LUOGO, "Avenue Street 487"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_LUOGO, "Sala 2"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_LUOGO, "Palazzo Chigi"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_LUOGO, "Casa Paolo"));
 	}
 	
 	@Test
