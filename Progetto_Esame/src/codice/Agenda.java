@@ -252,12 +252,11 @@ public class Agenda implements Iterable<Appuntamento> {
 			}
 			
 			ordinaAppuntamenti();
+			return 1;
 		} 
 		catch(AppuntamentoException e) {
 			return -2;
 		}
-		
-		return 1;
 	}
 	
 	
