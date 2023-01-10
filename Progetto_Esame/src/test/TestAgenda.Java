@@ -220,6 +220,15 @@ class TestAgenda {
 		assertTrue(agenda.searchAppuntamentoPerDataOrario("03-02-1998", "07-00").isEmpty());
 	}
 	
+	@Test
+	void test() throws AppuntamentoException {
+		ArrayList<Appuntamento> appuntamenti = new ArrayList<>();
+		appuntamenti.add(new Appuntamento("01-02-1998", "07-20", "80", "Sala Conferenze", "Luca"));
+		appuntamenti.add(new Appuntamento("01-02-2000", "06-30", "45", "Viale Roma 22", "Giovanna Pascoli"));
+		Agenda agenda = new Agenda(appuntamenti);
+		agenda.modificaAppuntamento("01-02-1998", "07-20", "data", "05-02-1998");
+		System.out.println(agenda.searchAppuntamentoPerData("05-02-1998").toString());
+	}
 	
 
 }
