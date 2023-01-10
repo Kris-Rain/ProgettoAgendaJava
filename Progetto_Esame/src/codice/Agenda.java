@@ -14,6 +14,8 @@ import java.util.Iterator;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+
+
 /**
  * 
  * @author Nicolò Bianchetto
@@ -53,7 +55,7 @@ public class Agenda implements Iterable<Appuntamento> {
 	
 	public Agenda(String nomeAgenda, ArrayList<Appuntamento> appuntamenti) {
 		this.nomeAgenda = (nomeAgenda.isEmpty()) ? "Agenda": nomeAgenda;
-		this.appuntamenti = (isAgenda(appuntamenti)) ? appuntamenti : new ArrayList<>();
+		this.appuntamenti = (isAgenda(appuntamenti)) ? new ArrayList<>(appuntamenti) : new ArrayList<>();
 		ordinaAppuntamenti();
 	}
 	
@@ -69,7 +71,6 @@ public class Agenda implements Iterable<Appuntamento> {
 	public Agenda(ArrayList<Appuntamento> appuntamenti) {
 		this("Agenda", appuntamenti);
 	}
-	
 
 	public Agenda(File file) throws FileNotFoundException, IOException {
 		
@@ -80,7 +81,7 @@ public class Agenda implements Iterable<Appuntamento> {
 
 		String stringaAppuntamento;
 		while((stringaAppuntamento = reader.readLine()) != null) {
-			String[] parametri = stringaAppuntamento.split("(\\s)+");
+			String[] parametri = stringaAppuntamento.split("///");
 			if(parametri.length == 5) {	//se i parametri non sono 5, ignoro la riga
 				try {
 					aggiungiAppuntamento(new Appuntamento(parametri[0], parametri[1], parametri[2], parametri[3], parametri[4]));	
@@ -130,6 +131,7 @@ public class Agenda implements Iterable<Appuntamento> {
 		return appuntamenti.size();
 	}
 
+	
 	private ArrayList<Appuntamento> searchAppuntamentoGenerico(Predicate <Appuntamento> predicato) {
 		return (ArrayList<Appuntamento>) appuntamenti.stream().filter(predicato).collect(Collectors.toList());
 	}
@@ -162,27 +164,6 @@ public class Agenda implements Iterable<Appuntamento> {
 		return true;
 	}
 	
-	public boolean isDataTimeCompatible(DataOrario dataTime) {
-		for(Appuntamento elemento: this) {
-			if(!elemento.isDataTimeCompatible(dataTime)) return false;
-		}
-		return true;
-	}
-	
-	/**
-	 * Ordino prima per orario e poi per data, in modo che alla fine ho gli appuntamenti ordinati
-	 * prima per data e poi per orario
-	 * La Giannini li vuole elencati per data, però secondo me ha senso ordinarli anche per orario a sto punto
-	 * Nel sorting multicriterio bisogna andare in senso opposto a quello per cui vuoi effettivamente ordinare ... ad esempio:
-	 * (2, 5) (1, 3) (5, 1) (1, 2)
-	 * se si vuole ordinare le tuple per i primi numeri e poi per i secondi, si sorta prima per i secondi e poi per i primi:
-	 * ordino per i secondi:
-	 * (5, 1) (1, 2) (1, 3) (2, 5)
-	 * poi i primi:
-	 * (1, 2) (1, 3) (2, 5) (5, 1)
-	 * 
-	 * so sta cosa perché l'aveva detto Guazzone a lezione di algoritmi
-	 */
 	
 	private void ordinaAppuntamenti() {
 		appuntamenti.sort( (first, second) -> first.getDataTimeInizio().compareTo(second.getDataTimeInizio()));
@@ -204,10 +185,12 @@ public class Agenda implements Iterable<Appuntamento> {
 		return elencaAppuntamenti(searchAppuntamentoPerPersona(nome));
 	}
 	
+	
 	public String elencaPerData(String data) {
 		return elencaAppuntamenti(searchAppuntamentoPerData(data));
 	}
 	
+
 	public boolean aggiungiAppuntamento(Appuntamento appointment) {
 		if(!this.isCompatible(appointment)) return false;
 		appuntamenti.add(appointment);
@@ -215,8 +198,14 @@ public class Agenda implements Iterable<Appuntamento> {
 		return true;
 	}
 	
-	public boolean aggiungiAppuntamento(String data, String orario, String durata, String luogo, String nomePersona) throws AppuntamentoException {
-		return aggiungiAppuntamento(new Appuntamento(data, orario, durata, luogo, nomePersona));
+	
+	public boolean aggiungiAppuntamento(String data, String orario, String durata, String luogo, String nomePersona) {
+		try {
+			return aggiungiAppuntamento(new Appuntamento(data, orario, durata, luogo, nomePersona));
+		}
+		catch(AppuntamentoException e) { 
+			return false; 
+		}
 	}
 	
 	public boolean rimuoviPerPersona(String nome) {
@@ -230,6 +219,7 @@ public class Agenda implements Iterable<Appuntamento> {
 	public boolean rimuoviPerDataOrario(String data, String orario) {
 		return appuntamenti.removeAll(searchAppuntamentoPerDataOrario(data, orario));
 	}
+	
 
 	public int modificaAppuntamento(String dataApp, String orarioApp, String parametroDaModificare, String newValue) {
 		ArrayList<Appuntamento> risultato = searchAppuntamentoPerDataOrario(dataApp, orarioApp);
@@ -244,36 +234,27 @@ public class Agenda implements Iterable<Appuntamento> {
 				vecchioAppuntamento.getPersona()
 		};
 
-		/*switch(parametroDaModificare.toLowerCase().strip()) {
+		switch(parametroDaModificare.toLowerCase().strip()) {
 			case "data" -> parametri[0] = newValue;
 			case "orario" -> parametri[1] = newValue; 
 			case "durata" -> parametri[2] = newValue; 
 			case "luogo" -> parametri[3] = newValue; 
 			case "persona" -> parametri[4] = newValue; 
-			default -> { return -2; }
+			default -> { return -3; }
 		}
-		
-		try {
+
+		try {	
 			Appuntamento nuovoAppuntamento = new Appuntamento(parametri[0], parametri[1], parametri[2], parametri[3], parametri[4]);
-			if(!this.isCompatible(nuovoAppuntamento)) return -1;
 			appuntamenti.set(appuntamenti.indexOf(vecchioAppuntamento), nuovoAppuntamento);
+			if(!isAgenda(appuntamenti))  {
+				appuntamenti.set(appuntamenti.indexOf(nuovoAppuntamento), vecchioAppuntamento);
+				return -1;
+			}
+			
 			ordinaAppuntamenti();
 		} 
 		catch(AppuntamentoException e) {
-			return -1;
-		}*/
-		
-		switch(parametroDaModificare.toLowerCase().strip()) {
-			case "data" -> {
-				if(isDataTimeCompatible(new DataOrario(newValue, parametri[1]))) vecchioAppuntamento.setData(newValue);
-			}
-			case "orario" -> isDataTimeCompatible(new DataOrario(parametri[0], newValue));
-			case "durata" -> isDataTimeCompatible(new DataOrario(parametri[0], parametri[1]).plusMinuti(newValue));
-			case "luogo" -> parametri[3] = newValue;
-			case "persona" -> parametri[4] = newValue;
-			default -> { return -2; }
-		
-		
+			return -2;
 		}
 		
 		return 1;
