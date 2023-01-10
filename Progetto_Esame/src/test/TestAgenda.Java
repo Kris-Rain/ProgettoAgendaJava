@@ -24,14 +24,22 @@ class TestAgenda {
 		appuntamenti.add(new Appuntamento("03-02-1998", "12-30", "60", "Ufficio", "Capo"));
 		appuntamenti.add(new Appuntamento("03-02-1998", "11-30", "60", "Ufficio", "Luca"));	
 		Agenda lavoro = new Agenda("Lavoro", appuntamenti);
+		Agenda agenda = new Agenda(appuntamenti);
 		assertEquals("Lavoro", lavoro.getNomeAgenda());
 		assertEquals(4, lavoro.getDimensioneAgenda());
+		assertEquals("Agenda", agenda.getNomeAgenda());
+		assertEquals(4, agenda.getDimensioneAgenda());
+		
+		/*Testo se ho ordinato tramite costruttore*/
 		appuntamenti = lavoro.getAppuntamenti();
-		/*Testo se ordinato tramite costruttore*/
 		assertEquals("01-02-1998 12-30 60 Ufficio Capo\n", appuntamenti.get(0).toString());
 		assertEquals("01-02-1998 14-30 60 Ufficio Luca\n", appuntamenti.get(1).toString());
 		assertEquals("03-02-1998 11-30 60 Ufficio Luca\n", appuntamenti.get(2).toString());
 		assertEquals("03-02-1998 12-30 60 Ufficio Capo\n", appuntamenti.get(3).toString());	
+		
+		/*Testo se aggiungendo un appuntamento non valido, costruisco un agenda vuota nonostante gli passi l'arraylist */
+		appuntamenti.add(new Appuntamento("01-02-1998", "14-30", "60", "Ufficio", "Luca"));
+		assertEquals(0, new Agenda(appuntamenti).getDimensioneAgenda());
 	}
 	
 	@Test
@@ -69,6 +77,58 @@ class TestAgenda {
 		assertFalse(lavoro.contains("01-03-1998", "12-35"));
 	}
 	
+	
+	@Test
+	void testIsAgenda() throws AppuntamentoException {
+		ArrayList<Appuntamento> appuntamenti = new ArrayList<>();
+		assertTrue(Agenda.isAgenda(appuntamenti));
+		appuntamenti.add(new Appuntamento("01-02-1998", "09-00", "80", "Sala Conferenze", "Luca"));
+		appuntamenti.add(new Appuntamento("01-02-1998", "08-00", "45", "Viale Roma 22", "Giovanna Pascoli"));
+		appuntamenti.add(new Appuntamento("01-02-1998", "07-00", "30", "Casa Mia", "Me Stesso"));
+		appuntamenti.add(new Appuntamento("01-02-1998", "06-30", "30", "Casa Mia", "Me Stesso"));
+		appuntamenti.add(new Appuntamento("01-02-1998", "14-30", "60", "Ufficio", "Luca"));
+		appuntamenti.add(new Appuntamento("01-02-1998", "12-30", "60", "Ufficio", "Capo"));
+		assertTrue(Agenda.isAgenda(appuntamenti));
+		
+		appuntamenti.add(new Appuntamento("01-02-1998", "13-00", "10", "Ufficio", "Luca"));
+		assertFalse(Agenda.isAgenda(appuntamenti));	
+		
+		appuntamenti.removeAll(appuntamenti);
+		assertTrue(Agenda.isAgenda(appuntamenti));
+		appuntamenti.add(new Appuntamento("23-07-2023", "09-00", "30", "Casa Mia", "Me Stesso"));
+		appuntamenti.add(new Appuntamento("23-07-2023", "08-00", "60", "Ufficio", "Capo"));
+		appuntamenti.add(new Appuntamento("23-07-2023", "09-30", "30", "Casa Mia", "Me Stesso"));
+		appuntamenti.add(new Appuntamento("23-07-2023", "11-30", "30", "Barbiere", "Francesco"));
+		appuntamenti.add(new Appuntamento("23-07-2023", "12-12", "60", "New York", "Luca"));
+		appuntamenti.add(new Appuntamento("23-07-2023", "06-00", "60", "Ufficio", "Capo"));
+		assertTrue(Agenda.isAgenda(appuntamenti));
+		
+		appuntamenti.add(new Appuntamento("23-07-2023", "06-59", "10", "Ufficio", "Luca"));
+		assertFalse(Agenda.isAgenda(appuntamenti));	
+		
+	}
+	
+	@Test
+	void testIsCompatible() throws AppuntamentoException {
+		ArrayList<Appuntamento> appuntamenti = new ArrayList<>();
+		appuntamenti.add(new Appuntamento("01-02-1998", "09-00", "80", "Sala Conferenze", "Luca"));
+		appuntamenti.add(new Appuntamento("01-02-1998", "08-00", "45", "Viale Roma 22", "Giovanna Pascoli"));
+		appuntamenti.add(new Appuntamento("02-02-1998", "07-00", "30", "Casa Mia", "Me Stesso"));
+		appuntamenti.add(new Appuntamento("02-02-1998", "06-30", "30", "Casa Mia", "Me Stesso"));
+		appuntamenti.add(new Appuntamento("02-02-1998", "14-30", "60", "Ufficio", "Luca"));
+		appuntamenti.add(new Appuntamento("03-02-1998", "12-30", "60", "Ufficio", "Capo"));
+		Agenda agenda = new Agenda(appuntamenti);
+		
+		assertTrue(agenda.isCompatible(new Appuntamento("04-02-1998", "12-30", "60", "Ufficio", "Capo")));
+		assertTrue(agenda.isCompatible(new Appuntamento("01-02-1998", "07-00", "60", "Ufficio", "Luca")));
+		assertTrue(agenda.isCompatible(new Appuntamento("03-02-1998", "13-30", "30", "Poste", "Capo")));
+		assertTrue(agenda.isCompatible(new Appuntamento("02-02-1998", "11-00", "30", "Casa", "Mamma")));
+		assertFalse(agenda.isCompatible(new Appuntamento("01-02-1998", "09-00", "80", "Sala Conferenze", "Luca")));
+		assertFalse(agenda.isCompatible(new Appuntamento("02-02-1998", "06-45", "30", "Ufficio", "Capo")));
+		assertFalse(agenda.isCompatible(new Appuntamento("02-02-1998", "06-59", "30", "Scuola", "Marta")));
+		assertFalse(agenda.isCompatible(new Appuntamento("03-02-1998", "11-00", "120", "Ufficio", "Giacomo")));
+	}
+	
 	@Test
 	void testAggiungiAppuntamento() throws AppuntamentoException {
 		Agenda lavoro = new Agenda("Lavoro");
@@ -95,5 +155,71 @@ class TestAgenda {
 		assertFalse(lavoro.aggiungiAppuntamento("01-11-2020", "03-50", "15", "Gattile", "Micio"));
 		assertEquals(7, lavoro.getDimensioneAgenda());
 	}
+	
+	
+	@Test
+	void testRicercaAppuntamentoPerData() throws AppuntamentoException {
+		ArrayList<Appuntamento> appuntamenti = new ArrayList<>();
+		appuntamenti.add(new Appuntamento("01-02-1998", "09-00", "80", "Sala Conferenze", "Luca"));
+		appuntamenti.add(new Appuntamento("01-02-1998", "08-00", "45", "Viale Roma 22", "Giovanna Pascoli"));
+		appuntamenti.add(new Appuntamento("02-02-1998", "07-00", "30", "Casa Mia", "Me Stesso"));
+		appuntamenti.add(new Appuntamento("02-02-1998", "06-30", "30", "Casa Mia", "Me Stesso"));
+		appuntamenti.add(new Appuntamento("02-02-1998", "14-30", "60", "Ufficio", "Luca"));
+		appuntamenti.add(new Appuntamento("03-02-1998", "12-30", "60", "Ufficio", "Capo"));
+		Agenda agenda = new Agenda(appuntamenti);
+		
+		assertEquals(1, agenda.searchAppuntamentoPerData("03-02-1998").size());
+		assertEquals(3, agenda.searchAppuntamentoPerData("02-02-1998").size());
+		assertEquals(2, agenda.searchAppuntamentoPerData("01-02-1998").size());
+		assertEquals(0, agenda.searchAppuntamentoPerData("04-02-1998").size());
+		assertEquals(0, agenda.searchAppuntamentoPerData("04-02").size());
+	}
+	
+	
+	@Test
+	void testRicercaAppuntamentoPerPersona() throws AppuntamentoException {
+		ArrayList<Appuntamento> appuntamenti = new ArrayList<>();
+		appuntamenti.add(new Appuntamento("01-02-1998", "07-20", "80", "Sala Conferenze", "Luca"));
+		appuntamenti.add(new Appuntamento("01-02-1998", "06-30", "45", "Viale Roma 22", "Giovanna Pascoli"));
+		appuntamenti.add(new Appuntamento("02-02-1998", "07-00", "30", "Casa Mia", "Giacomo"));
+		appuntamenti.add(new Appuntamento("02-02-1998", "06-30", "30", "Casa Mia", "Giacomo"));
+		appuntamenti.add(new Appuntamento("02-02-1998", "14-30", "60", "Ufficio", "Luca"));
+		appuntamenti.add(new Appuntamento("03-02-1998", "06-30", "60", "Ufficio", "Luca"));
+		Agenda agenda = new Agenda(appuntamenti);
+		
+		assertEquals(3, agenda.searchAppuntamentoPerPersona("luca").size());
+		assertEquals(2, agenda.searchAppuntamentoPerPersona("GIACOMO").size());
+		assertEquals(1, agenda.searchAppuntamentoPerPersona("GioVanna pascoli").size());
+		assertEquals(0, agenda.searchAppuntamentoPerPersona("paolo").size());
+		assertEquals(0, agenda.searchAppuntamentoPerPersona("Luc").size());
+	}
+	
+	
+	@Test
+	void testRicercaAppuntamentoPerDataOrario() throws AppuntamentoException {
+		ArrayList<Appuntamento> appuntamenti = new ArrayList<>();
+		appuntamenti.add(new Appuntamento("01-02-1998", "07-20", "80", "Sala Conferenze", "Luca"));
+		appuntamenti.add(new Appuntamento("01-02-1998", "06-30", "45", "Viale Roma 22", "Giovanna Pascoli"));
+		appuntamenti.add(new Appuntamento("02-02-1998", "07-00", "30", "Casa Mia", "Giacomo"));
+		appuntamenti.add(new Appuntamento("02-02-1998", "06-30", "30", "Casa Mia", "Giacomo"));
+		appuntamenti.add(new Appuntamento("02-02-1998", "14-30", "60", "Ufficio", "Luca"));
+		appuntamenti.add(new Appuntamento("03-02-1998", "06-30", "60", "Ufficio", "Luca"));
+		Agenda agenda = new Agenda(appuntamenti);
+		
+		assertEquals(1, agenda.searchAppuntamentoPerDataOrario("01-02-1998", "06-30").size());
+		assertEquals(1, agenda.searchAppuntamentoPerDataOrario("01-02-1998", "07-20").size());
+		assertEquals(1, agenda.searchAppuntamentoPerDataOrario("03-02-1998", "06-30").size());
+		assertEquals(1, agenda.searchAppuntamentoPerDataOrario("02-02-1998", "06-30").size());
+		assertEquals(1, agenda.searchAppuntamentoPerDataOrario("02-02-1998", "07-00").size());
+		assertEquals(1, agenda.searchAppuntamentoPerDataOrario("02-02-1998", "14-30").size());
+		
+		assertTrue(agenda.searchAppuntamentoPerDataOrario("02-02-1998", "17-30").isEmpty());
+		assertTrue(agenda.searchAppuntamentoPerDataOrario("04-02-1998", "07-20").isEmpty());
+		assertTrue(agenda.searchAppuntamentoPerDataOrario("04-02-1998", "06-30").isEmpty());
+		assertTrue(agenda.searchAppuntamentoPerDataOrario("01-02-1998", "23-00").isEmpty());
+		assertTrue(agenda.searchAppuntamentoPerDataOrario("03-02-1998", "07-00").isEmpty());
+	}
+	
+	
 
 }
