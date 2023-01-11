@@ -266,7 +266,7 @@ public class Agenda implements Iterable<Appuntamento> {
 	}
 	*/
 	
-	private int testModifica(Appuntamento oldApp, String newValue, String flag) throws AppuntamentoException {
+	private int testModifica(Appuntamento oldApp, String newValue, String flag) {
 		try {
 			Appuntamento newApp = new Appuntamento(
 					(flag.equals("data")) ? newValue : oldApp.getData(),
@@ -289,7 +289,7 @@ public class Agenda implements Iterable<Appuntamento> {
 	
 	
 	
-	public int modificaAppuntamento(String dataApp, String orarioApp, String parametroDaModificare, String newValue) throws AppuntamentoException {
+	public int modificaAppuntamento(String dataApp, String orarioApp, String parametroDaModificare, String newValue) {
 		ArrayList<Appuntamento> risultato = searchAppuntamentoPerDataOrario(dataApp, orarioApp);
 		if(risultato.isEmpty()) return 0;
 		Appuntamento vecchioAppuntamento = risultato.get(0);
