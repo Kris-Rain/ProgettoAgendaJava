@@ -56,7 +56,7 @@ public class Agenda implements Iterable<Appuntamento> {
 	public Agenda(String nomeAgenda, ArrayList<Appuntamento> appuntamenti) {
 		this.nomeAgenda = (nomeAgenda.isEmpty()) ? "Agenda": nomeAgenda;
 		this.appuntamenti = (isAgenda(appuntamenti)) ? new ArrayList<>(appuntamenti) : new ArrayList<>();
-		ordinaAppuntamenti();
+		ordinaAppuntamenti(this.appuntamenti);
 	}
 	
 	public Agenda(String nomeAgenda) {
@@ -108,7 +108,7 @@ public class Agenda implements Iterable<Appuntamento> {
 	}
 	
 	public static boolean isAgenda(ArrayList<Appuntamento> appuntamenti) {
-		appuntamenti.sort( (first, second) -> first.getDataTimeInizio().compareTo(second.getDataTimeInizio()));
+		ordinaAppuntamenti(appuntamenti);
 		for(int i = 0; i < appuntamenti.size() - 1; i++) {
 			if(!appuntamenti.get(i).isBefore(appuntamenti.get(i+1))) return false;
 		}
@@ -165,7 +165,7 @@ public class Agenda implements Iterable<Appuntamento> {
 	}
 	
 	
-	private void ordinaAppuntamenti() {
+	private static void ordinaAppuntamenti(ArrayList<Appuntamento> appuntamenti) {
 		appuntamenti.sort( (first, second) -> first.getDataTimeInizio().compareTo(second.getDataTimeInizio()));
 	}
 	
@@ -194,7 +194,7 @@ public class Agenda implements Iterable<Appuntamento> {
 	public boolean aggiungiAppuntamento(Appuntamento appointment) {
 		if(!this.isCompatible(appointment)) return false;
 		appuntamenti.add(appointment);
-		ordinaAppuntamenti();
+		ordinaAppuntamenti(appuntamenti);
 		return true;
 	}
 	
@@ -248,10 +248,10 @@ public class Agenda implements Iterable<Appuntamento> {
 			appuntamenti.set(appuntamenti.indexOf(vecchioAppuntamento), nuovoAppuntamento);
 			if(!isAgenda(appuntamenti))  {
 				appuntamenti.set(appuntamenti.indexOf(nuovoAppuntamento), vecchioAppuntamento);
+				ordinaAppuntamenti(appuntamenti);
 				return -1;
 			}
-			
-			ordinaAppuntamenti();
+				
 			return 1;
 		} 
 		catch(AppuntamentoException e) {
