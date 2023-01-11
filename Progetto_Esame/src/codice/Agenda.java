@@ -226,43 +226,64 @@ public class Agenda implements Iterable<Appuntamento> {
 		return appuntamenti.removeAll(searchAppuntamentoPerDataOrario(data, orario));
 	}
 	
+	private void modificaPer(Predicate<Appuntamento> aggiunta, Appuntamento newApp) {
+		aggiunta.test(newApp);
+	}
 
-	public int modificaAppuntamento(String dataApp, String orarioApp, String parametroDaModificare, String newValue) {
+	public int modificaAppuntamento(String dataApp, String orarioApp, String parametroDaModificare, String newValue) throws AppuntamentoException {
 		ArrayList<Appuntamento> risultato = searchAppuntamentoPerDataOrario(dataApp, orarioApp);
 		if(risultato.isEmpty()) return 0;
 		Appuntamento vecchioAppuntamento = risultato.get(0);
+		this.rimuoviPerDataOrario(dataApp, orarioApp);
 		
-		String[] parametri = {
-				vecchioAppuntamento.getData(),
-				vecchioAppuntamento.getOrario(),
-				vecchioAppuntamento.getDurata(),
-				vecchioAppuntamento.getLuogo(),
-				vecchioAppuntamento.getPersona()
-		};
-
-		switch(parametroDaModificare.toLowerCase().strip()) {
-			case "data" -> parametri[0] = newValue;
-			case "orario" -> parametri[1] = newValue; 
-			case "durata" -> parametri[2] = newValue; 
-			case "luogo" -> parametri[3] = newValue; 
-			case "persona" -> parametri[4] = newValue; 
-			default -> { return -3; }
-		}
-
-		try {	
-			Appuntamento nuovoAppuntamento = new Appuntamento(parametri[0], parametri[1], parametri[2], parametri[3], parametri[4]);
-			appuntamenti.set(appuntamenti.indexOf(vecchioAppuntamento), nuovoAppuntamento);
-			if(!isAgenda(appuntamenti))  {
-				appuntamenti.set(appuntamenti.indexOf(nuovoAppuntamento), vecchioAppuntamento);
-				ordinaAppuntamenti(appuntamenti);
-				return -1;
+		try {
+			switch(parametroDaModificare.toLowerCase().strip()) {
+			case "data" -> {
+				Appuntamento newAppuntamento = new Appuntamento(newValue, vecchioAppuntamento.getOrario(), vecchioAppuntamento.getDurata(), vecchioAppuntamento.getLuogo(), vecchioAppuntamento.getPersona());
+				if(!this.aggiungiAppuntamento(newAppuntamento)) {
+					this.aggiungiAppuntamento(vecchioAppuntamento);
+					return -1;
+				}
 			}
-				
-			return 1;
-		} 
+			case "orario" -> {
+				Appuntamento newAppuntamento = new Appuntamento(vecchioAppuntamento.getData(), newValue, vecchioAppuntamento.getDurata(), vecchioAppuntamento.getLuogo(), vecchioAppuntamento.getPersona());
+				if(!this.aggiungiAppuntamento(newAppuntamento)) {
+					this.aggiungiAppuntamento(vecchioAppuntamento);
+					return -1;
+				}
+			}
+			case "durata" -> {
+				Appuntamento newAppuntamento = new Appuntamento(vecchioAppuntamento.getData(), vecchioAppuntamento.getOrario(), newValue, vecchioAppuntamento.getLuogo(), vecchioAppuntamento.getPersona());
+				if(!this.aggiungiAppuntamento(newAppuntamento)) {
+					this.aggiungiAppuntamento(vecchioAppuntamento);
+					return -1;
+				}
+			}
+			case "luogo" -> {
+				Appuntamento newAppuntamento = new Appuntamento(vecchioAppuntamento.getData(), vecchioAppuntamento.getOrario(), vecchioAppuntamento.getDurata(), newValue, vecchioAppuntamento.getPersona());
+				if(!this.aggiungiAppuntamento(newAppuntamento)) {
+					this.aggiungiAppuntamento(vecchioAppuntamento);
+					return -1;
+				}
+			}
+			case "persona" -> {
+				Appuntamento newAppuntamento = new Appuntamento(vecchioAppuntamento.getData(), vecchioAppuntamento.getOrario(), vecchioAppuntamento.getDurata(), vecchioAppuntamento.getLuogo(), newValue);
+				if(!this.aggiungiAppuntamento(newAppuntamento)) {
+					this.aggiungiAppuntamento(vecchioAppuntamento);
+					return -1;
+				}
+			}
+			default -> {
+				this.aggiungiAppuntamento(vecchioAppuntamento);
+				return -3;
+				}
+			}
+		}
 		catch(AppuntamentoException e) {
+			this.aggiungiAppuntamento(vecchioAppuntamento);
 			return -2;
 		}
+		return 1;
 	}
 	
 	
@@ -277,6 +298,4 @@ public class Agenda implements Iterable<Appuntamento> {
 	public Agenda clone() {
 		return new Agenda(nomeAgenda, appuntamenti);
 	}
-	
-	
 }
