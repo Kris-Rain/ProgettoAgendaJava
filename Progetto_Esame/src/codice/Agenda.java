@@ -107,10 +107,16 @@ public class Agenda implements Iterable<Appuntamento> {
 		
 	}
 	
+	/*Creo una copia e faccio il test sulla copia e non sugli appuntamenti originali per rispettare la regola
+	 * "Un metodo deve fare solo una cosa e deve fare solo quella"
+	 * Quindi isAgenda ti dice se l'arraylist può essere un agenda o meno, ma non deve anche ordinare gli appuntamenti
+	 * Perché magari, per qualche motivo strano, io non gli voglio ordinati in ordine di data e orario
+	*/
 	public static boolean isAgenda(ArrayList<Appuntamento> appuntamenti) {
-		ordinaAppuntamenti(appuntamenti);
-		for(int i = 0; i < appuntamenti.size() - 1; i++) {
-			if(!appuntamenti.get(i).isBefore(appuntamenti.get(i+1))) return false;
+		ArrayList<Appuntamento> test = new ArrayList<>(appuntamenti);
+		ordinaAppuntamenti(test);
+		for(int i = 0; i < test.size() - 1; i++) {
+			if(!test.get(i).isBefore(test.get(i+1))) return false;
 		}
 		return true;
 	}
