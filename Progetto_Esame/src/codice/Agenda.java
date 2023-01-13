@@ -330,7 +330,7 @@ public class Agenda implements Iterable<Appuntamento> {
 	public boolean equals(Object object) {
 		if(object == null || object.getClass() != this.getClass()) return false;
 		Agenda other = (Agenda) object;
-		return (other.getNomeAgenda().equals(this.nomeAgenda) && other.getAppuntamenti().equals(other.getAppuntamenti()));
+		return (other.getNomeAgenda().equals(this.nomeAgenda) && this.appuntamenti.equals(other.getAppuntamenti()));
 	}
 	
 	
