@@ -7,9 +7,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-//import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -29,6 +29,7 @@ public class Agenda implements Iterable<Appuntamento> {
 	
 	private String nomeAgenda;
 	private ArrayList<Appuntamento> appuntamenti;
+	private boolean saved;
 	public static final String PATHNAME = "Agende_testuali/";
 	
 	
@@ -57,6 +58,7 @@ public class Agenda implements Iterable<Appuntamento> {
 	public Agenda(String nomeAgenda, ArrayList<Appuntamento> appuntamenti) {
 		this.nomeAgenda = (nomeAgenda.isEmpty()) ? "Agenda": nomeAgenda;
 		this.appuntamenti = (isAgenda(appuntamenti)) ? new ArrayList<>(appuntamenti) : new ArrayList<>();
+		saved = false;
 		ordinaAppuntamenti(this.appuntamenti);
 	}
 	
@@ -91,6 +93,8 @@ public class Agenda implements Iterable<Appuntamento> {
 				} catch(AppuntamentoException e) { appendErr.accept(stringaAppuntamento); }	
 			} 	
 		reader.close();	
+		ordinaAppuntamenti(appuntamenti);
+		saved = true;
 		/* Nel peggiore dei casi, se non riesco a leggere nessuna riga, creo una Agenda vuota. 
 		 * Lancio un'eccezione solo se il file non esiste o ho avuto IOException
 		 */
@@ -112,7 +116,8 @@ public class Agenda implements Iterable<Appuntamento> {
 		BufferedWriter br = new BufferedWriter(new FileWriter(file));
 		br.write(elencaAppuntamenti(appuntamenti));
 		br.close();
-		return true;
+		saved = true;
+		return saved;
 	}
 	
 	/*Creo una copia e faccio il test sulla copia e non sugli appuntamenti originali per rispettare la regola
@@ -209,6 +214,7 @@ public class Agenda implements Iterable<Appuntamento> {
 		if(!this.isCompatible(appointment)) return false;
 		appuntamenti.add(appointment);
 		ordinaAppuntamenti(appuntamenti);
+		saved = false;
 		return true;
 	}
 	
@@ -222,16 +228,22 @@ public class Agenda implements Iterable<Appuntamento> {
 		}
 	}
 	
+	private boolean rimuoviGenerico(BooleanSupplier removeBy) {
+		boolean risultato = removeBy.getAsBoolean();
+		if(risultato) saved = false;
+		return risultato;
+	}
+	
 	public boolean rimuoviPerPersona(String nome) {
-		return appuntamenti.removeAll(searchAppuntamentoPerPersona(nome));
+		return rimuoviGenerico( () -> appuntamenti.removeAll(searchAppuntamentoPerPersona(nome)));
 	}
 	
 	public boolean rimuoviPerData(String data) {
-		return appuntamenti.removeAll(searchAppuntamentoPerData(data));
+		return rimuoviGenerico( () -> appuntamenti.removeAll(searchAppuntamentoPerData(data)));
 	}
 	
 	public boolean rimuoviPerDataOrario(String data, String orario) {
-		return appuntamenti.removeAll(searchAppuntamentoPerDataOrario(data, orario));
+		return rimuoviGenerico( () -> appuntamenti.removeAll(searchAppuntamentoPerDataOrario(data, orario)));
 	}
 	
 	/*
@@ -287,6 +299,7 @@ public class Agenda implements Iterable<Appuntamento> {
 				aggiungiAppuntamento(oldApp);
 				return -1;
 			}
+			saved = false;
 			return 1;
 		}
 		catch(AppuntamentoException e) {
@@ -314,6 +327,9 @@ public class Agenda implements Iterable<Appuntamento> {
 		}
 	}
 	
+	public boolean isSaved() {
+		return saved;
+	}
 	
 	@Override
 	public Iterator<Appuntamento> iterator() {
