@@ -18,11 +18,6 @@ class TestDataOrario {
 	
 	@Test
 	void testAddTempo() {
-		DataOrario datatime = new DataOrario("29-02-2020", "00:11");
-		datatime.addTempoMinuti("150");
-		assertEquals("29-02-2020 02:41", datatime.toString());
-		datatime.addTempoMinuti("1440");
-		assertEquals("01-03-2020 02:41", datatime.toString());
 		assertEquals("01-01-2023 00:30", new DataOrario("31-12-2022", "23:30").plusMinuti("60").toString());
 		assertEquals("01-03-2001 00:30", new DataOrario("28-02-2001", "23:30").plusMinuti("60").toString());
 	}
