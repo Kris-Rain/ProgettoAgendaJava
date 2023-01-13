@@ -3,7 +3,6 @@ package codice;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -11,6 +10,7 @@ import java.util.ArrayList;
 //import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -29,6 +29,7 @@ public class Agenda implements Iterable<Appuntamento> {
 	
 	private String nomeAgenda;
 	private ArrayList<Appuntamento> appuntamenti;
+	public static final String PATHNAME = "Agende_testuali/";
 	
 	
 	public class IteratoreAgenda implements Iterator<Appuntamento> {
@@ -72,39 +73,46 @@ public class Agenda implements Iterable<Appuntamento> {
 		this("Agenda", appuntamenti);
 	}
 
-	public Agenda(File file) throws FileNotFoundException, IOException {
-		
-		nomeAgenda = file.getName();
-		appuntamenti = new ArrayList<>();
+	public Agenda(File file) throws IOException {
 		
 		BufferedReader reader = new BufferedReader(new FileReader(file));
+		
+		nomeAgenda = stripExtension(file.getName());
+		appuntamenti = new ArrayList<>();
 
 		String stringaAppuntamento;
+		String [] errString = new String[2];
+		errString[0] = errString[1] = "Attenzione. Impossibile leggere dal file " + file.getName() + " le seguenti righe poiché malformate:\n";
 		while((stringaAppuntamento = reader.readLine()) != null) {
-			String[] parametri = stringaAppuntamento.split("///");
-			if(parametri.length == 5) {	//se i parametri non sono 5, ignoro la riga
+			Consumer<String> appendErr = (errLine) -> errString[1] += "Riga: " + errLine + "\n";
+			String[] parametri = stringaAppuntamento.split("((min)?\\|)");
 				try {
-					aggiungiAppuntamento(new Appuntamento(parametri[0], parametri[1], parametri[2], parametri[3], parametri[4]));	
-					//Provo ad aggiungere, aggiungiAppuntamento testa anche se compatibile.
-				} catch(AppuntamentoException e) {
-					//do nothing. Ignoro la riga
-				}	
-			}
-		}
+					if(parametri.length != 5 || !aggiungiAppuntamento(new Appuntamento(parametri))) appendErr.accept(stringaAppuntamento);						
+				} catch(AppuntamentoException e) { appendErr.accept(stringaAppuntamento); }	
+			} 	
 		reader.close();	
 		/* Nel peggiore dei casi, se non riesco a leggere nessuna riga, creo una Agenda vuota. 
 		 * Lancio un'eccezione solo se il file non esiste o ho avuto IOException
 		 */
+		if(!errString[1].equals(errString[0]))	System.err.println(errString[1] + "Agenda " + nomeAgenda + " creata ignorando le righe elencate.");
 	}
 	
+	private static String stripExtension(String filename) {
+	    return filename.lastIndexOf(".") > 0 ? filename.substring(0, filename.lastIndexOf(".")) : filename;
+	}
+
+	public static void createPathToAgende() {
+		new File(PATHNAME).mkdirs();
+	}
 	
-	public void salvaAgendaSuFile() throws FileNotFoundException, IOException {
-		File file = new File("/pathname/"+nomeAgenda);
-		file.createNewFile();
+	public boolean salvaAgendaSuFile() throws IOException {
+		if(!new File(PATHNAME).exists()) createPathToAgende();
+		File file = new File(PATHNAME, nomeAgenda + ".txt");
+		if(!file.exists()) file.createNewFile();
 		BufferedWriter br = new BufferedWriter(new FileWriter(file));
-		br.write(this.toString());
+		br.write(elencaAppuntamenti(appuntamenti));
 		br.close();
-		
+		return true;
 	}
 	
 	/*Creo una copia e faccio il test sulla copia e non sugli appuntamenti originali per rispettare la regola
@@ -288,7 +296,6 @@ public class Agenda implements Iterable<Appuntamento> {
 	}
 	
 	
-	
 	public int modificaAppuntamento(String dataApp, String orarioApp, String parametroDaModificare, String newValue) {
 		ArrayList<Appuntamento> risultato = searchAppuntamentoPerDataOrario(dataApp, orarioApp);
 		if(risultato.isEmpty()) return 0;
@@ -308,7 +315,6 @@ public class Agenda implements Iterable<Appuntamento> {
 	}
 	
 	
-
 	@Override
 	public Iterator<Appuntamento> iterator() {
 		return new IteratoreAgenda();
@@ -318,6 +324,13 @@ public class Agenda implements Iterable<Appuntamento> {
 	@Override
 	public Agenda clone() {
 		return new Agenda(nomeAgenda, appuntamenti);
+	}
+	
+	@Override
+	public boolean equals(Object object) {
+		if(object == null || object.getClass() != this.getClass()) return false;
+		Agenda other = (Agenda) object;
+		return (other.getNomeAgenda().equals(this.nomeAgenda) && other.getAppuntamenti().equals(other.getAppuntamenti()));
 	}
 	
 	
