@@ -1,5 +1,4 @@
 
-
 /**
  * @author Kristian Rigo
  * @author Nicolò Bianchetto
@@ -38,7 +37,19 @@ class TestAppuntamento {
 		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DURATA, a1.getDurata()));
 		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_LUOGO, a1.getLuogo()));
 		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, a1.getPersona()));
-
+		
+		String[] param={"01-02-1998", "09-00", "80", "Sala Conferenze", "Luca"};
+		String[] param2={"01-02-1998", "09-00", "80", "Sala Conferenze", "Luca"};
+		String[] param3={"01-02-1998", "08-00", "45", "Viale Roma 22", "Giovanna Pascoli"};
+		String[] param4={"01-02-1998", "08-00", "45000", "New York", "Johhny"};
+		String[] param5={"29-02-2022", "07-00", "30", "Casa mia", "Giacomo"};
+		String[] param6={"01-02-1998", "08-00", "45", "Ristorante", "1135"};
+		assertDoesNotThrow(() -> new Appuntamento(param));
+		assertDoesNotThrow(() -> new Appuntamento(param2));
+		assertDoesNotThrow(() -> new Appuntamento(param3));
+		assertThrows(AppuntamentoException.class, () -> new Appuntamento(param4));
+		assertThrows(AppuntamentoException.class, () -> new Appuntamento(param5));
+		assertThrows(AppuntamentoException.class, () -> new Appuntamento(param6));
 	}
 	
 	@Test
@@ -175,23 +186,13 @@ class TestAppuntamento {
 		Appuntamento a3 = new Appuntamento("11-12-2021", "13-30", "30", "Milano", "Luca");
 		Appuntamento a4 = new Appuntamento("10-12-2021", "14-00", "30", "Milano", "Luca");
 		Appuntamento a5 = new Appuntamento("10-12-2021", "13-45", "30", "Milano", "Luca");
+		Appuntamento a6 = new Appuntamento("11-12-2021", "13-45", "30", "Milano", "Luca");
 		assertFalse(a1.isCompatible(a2));
+		assertFalse(a4.isCompatible(a5));
+		assertFalse(a3.isCompatible(a6));
 		assertTrue(a1.isCompatible(a3));
 		assertTrue(a1.isCompatible(a4));
 		assertTrue(a1.isCompatible(a5));
-	}
-	
-	@Test
-	void testIsDataTimeCompatible() throws AppuntamentoException {
-		Appuntamento a1 = new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca");
-		Appuntamento a2 = new Appuntamento("10-12-2021", "23-45", "30", "Milano", "Luca");
-		Appuntamento a3 = new Appuntamento("11-12-2021", "13-30", "30", "Milano", "Luca");
-		Appuntamento a4 = new Appuntamento("10-12-2021", "14-00", "30", "Milano", "Luca");
-		Appuntamento a5 = new Appuntamento("10-12-2021", "13-45", "30", "Milano", "Luca");
-		assertFalse(a1.isDataTimeCompatible(a2.getDataTimeInizio()));
-		assertTrue(a1.isDataTimeCompatible(a3.getDataTimeInizio()));
-		assertTrue(a1.isDataTimeCompatible(a4.getDataTimeInizio()));
-		assertTrue(a1.isDataTimeCompatible(a5.getDataTimeInizio()));
 	}
 	
 	@Test
