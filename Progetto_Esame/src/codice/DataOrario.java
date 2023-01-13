@@ -7,8 +7,8 @@ public class DataOrario {
 	
 	private LocalDate data;
 	private LocalTime orario;
-	private static DateTimeFormatter formatterData = DateTimeFormatter.ofPattern("dd-MM-uuuu");
-	private static DateTimeFormatter formatterTime = DateTimeFormatter.ofPattern("HH-mm");
+	private final static DateTimeFormatter formatterData = DateTimeFormatter.ofPattern("dd-MM-uuuu");
+	private final static DateTimeFormatter formatterTime = DateTimeFormatter.ofPattern("HH-mm");
 	
 	public DataOrario(LocalDate data, LocalTime orario) {
 		this.data = data;
@@ -39,6 +39,7 @@ public class DataOrario {
 		return orario.format(formatterTime);
 	}
 	
+	
 	public DataOrario plusMinuti(String durata) {
 		LocalDateTime ldt = data.atTime(orario).plusMinutes(Long.parseLong(durata));
 		return new DataOrario(ldt.toLocalDate(), ldt.toLocalTime());
@@ -60,5 +61,12 @@ public class DataOrario {
 	@Override
 	public String toString() {
 		return data.format(formatterData) + " " + getOrarioToString();
+	}
+	
+	@Override
+	public boolean equals(Object object) {
+		if(object == null || object.getClass() != this.getClass()) return false;
+		DataOrario other = (DataOrario) object;
+		return (other.getData().equals(this.data)) && (other.getOrario().equals(this.orario));
 	}
 }
