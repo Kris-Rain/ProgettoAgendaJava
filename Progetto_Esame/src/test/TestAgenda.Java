@@ -56,7 +56,7 @@ class TestAgenda {
 		appuntamenti.add(new Appuntamento("03-02-1998", "12-30", "60", "Ufficio", "Capo"));
 		Agenda agenda = new Agenda("Pippo", appuntamenti);
 		assertTrue(agenda.salvaAgendaSuFile());
-		System.out.print(new File(Agenda.PATHNAME, agenda.getNomeAgenda() + ".txt").getName());
+		//System.out.print(new File(Agenda.PATHNAME, agenda.getNomeAgenda() + ".txt").getName());
 		Agenda agenda2 = new Agenda(new File(Agenda.PATHNAME, agenda.getNomeAgenda() + ".txt"));
 		assertTrue(agenda.equals(agenda2));
 		assertTrue(agenda2.salvaAgendaSuFile());
@@ -75,7 +75,7 @@ class TestAgenda {
 	void testContains() throws AppuntamentoException {
 		ArrayList<Appuntamento> appuntamenti = new ArrayList<>();
 		Appuntamento daInserire = new Appuntamento("04-02-1998", "16-00", "80", "Sala Conferenze", "Luca");
-		Appuntamento daNonInserire = new Appuntamento("04-02-1998", "16-00", "80", "Sala Conferenze", "Luca");
+		Appuntamento daNonInserire = new Appuntamento("05-02-1998", "16-00", "80", "Sala Conferenze", "Luca");
 		appuntamenti.add(daInserire);
 		appuntamenti.add(new Appuntamento("01-02-1998", "14-30", "60", "Ufficio", "Luca"));
 		appuntamenti.add(new Appuntamento("01-03-1998", "12-30", "60", "Ufficio", "Capo"));
