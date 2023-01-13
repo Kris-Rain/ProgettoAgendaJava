@@ -248,4 +248,14 @@ public class Appuntamento {
 		return this.getData()+" "+this.getOrario()+" "+this.getDurata()+" "+this.getLuogo()+" "+this.getPersona()+"\n";
 	}
 	
+	@Override
+	public boolean equals(Object object) {
+		if(object==null || object.getClass() != this.getClass()) return false;
+		Appuntamento other = (Appuntamento) object;
+		return (other.getDataTimeInizio().equals(this.dataTimeInizio)) 
+				&& (other.getDataTimeFine().equals(this.dataTimeFine)) 
+				&& (other.getDurata().equals(this.durata))
+				&& (other.getLuogo().equals(this.luogo))
+				&& (other.getPersona().equals(this.nomePersona));
+	}
 }
