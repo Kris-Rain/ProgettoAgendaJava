@@ -55,9 +55,11 @@ class TestAgenda {
 		appuntamenti.add(new Appuntamento("02-02-1998", "14-30", "60", "Ufficio", "Luca"));
 		appuntamenti.add(new Appuntamento("03-02-1998", "12-30", "60", "Ufficio", "Capo"));
 		Agenda agenda = new Agenda("Pippo", appuntamenti);
+		assertFalse(agenda.isSaved());
 		assertTrue(agenda.salvaAgendaSuFile());
-		//System.out.print(new File(Agenda.PATHNAME, agenda.getNomeAgenda() + ".txt").getName());
+		assertTrue(agenda.isSaved());
 		Agenda agenda2 = new Agenda(new File(Agenda.PATHNAME, agenda.getNomeAgenda() + ".txt"));
+		assertTrue(agenda.isSaved());
 		assertTrue(agenda.equals(agenda2));
 		assertTrue(agenda2.salvaAgendaSuFile());
 	}
@@ -502,6 +504,38 @@ class TestAgenda {
 		assertTrue(agenda2.equals(agenda2.clone()));
 		assertFalse(agenda1.equals(agenda2));
 		assertFalse(agenda2.equals(agenda3));
+	}
+	
+	
+	@Test
+	void testIsSaved() throws AppuntamentoException, IOException {
+		ArrayList<Appuntamento> appuntamenti = new ArrayList<>();
+		appuntamenti.add(new Appuntamento("02-02-2023", "14-30", "60", "Ufficio", "Luca"));
+		appuntamenti.add(new Appuntamento("01-02-2023", "06-30", "45", "Viale Roma 22", "Giovanna Pascoli"));
+		appuntamenti.add(new Appuntamento("02-02-2023", "07-00", "30", "Casa Mia", "Giacomo"));
+		appuntamenti.add(new Appuntamento("02-02-2023", "06-30", "30", "Ristorante", "Giacomo"));
+		Agenda varie = new Agenda("Varie", appuntamenti);
+		assertFalse(varie.isSaved());
+		assertTrue(varie.salvaAgendaSuFile());
+		assertTrue(varie.isSaved());
+		assertEquals(-1, varie.modificaAppuntamento("02-02-2023", "14-30", "orario", "07-15"));
+		assertTrue(varie.isSaved());
+		assertEquals(1, varie.modificaAppuntamento("02-02-2023", "14-30", "orario", "13-30"));
+		assertFalse(varie.isSaved());
+		assertTrue(varie.salvaAgendaSuFile());
+		assertTrue(varie.isSaved());
+		assertFalse(varie.aggiungiAppuntamento("01-02-2023", "06-35", "15", "Ufficio", "Paolo"));
+		assertTrue(varie.isSaved());
+		assertTrue(varie.aggiungiAppuntamento("01-02-2023", "12-00", "15", "Ufficio", "Paolo"));
+		assertFalse(varie.isSaved());
+		assertTrue(varie.salvaAgendaSuFile());
+		assertTrue(varie.isSaved());
+		assertFalse(varie.rimuoviPerPersona("romolo"));
+		assertTrue(varie.isSaved());
+		assertTrue(varie.rimuoviPerPersona("giacomo"));
+		assertFalse(varie.isSaved());
+		assertTrue(varie.salvaAgendaSuFile());
+		assertTrue(varie.isSaved());
 	}
 
 }
