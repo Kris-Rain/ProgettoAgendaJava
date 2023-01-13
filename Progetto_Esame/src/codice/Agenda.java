@@ -296,14 +296,16 @@ public class Agenda implements Iterable<Appuntamento> {
 					(flag.equals("persona")) ? newValue : oldApp.getPersona());
 			
 			if(!aggiungiAppuntamento(newApp)) {
-				aggiungiAppuntamento(oldApp);
+				appuntamenti.add(oldApp);
+				ordinaAppuntamenti(appuntamenti);
 				return -1;
 			}
-			saved = false;
+			
 			return 1;
 		}
 		catch(AppuntamentoException e) {
-			aggiungiAppuntamento(oldApp);
+			appuntamenti.add(oldApp);
+			ordinaAppuntamenti(appuntamenti);
 			return -2;
 		}
 	}
@@ -313,7 +315,7 @@ public class Agenda implements Iterable<Appuntamento> {
 		ArrayList<Appuntamento> risultato = searchAppuntamentoPerDataOrario(dataApp, orarioApp);
 		if(risultato.isEmpty()) return 0;
 		Appuntamento vecchioAppuntamento = risultato.get(0);
-		rimuoviPerDataOrario(dataApp, orarioApp);
+		appuntamenti.remove(vecchioAppuntamento);
 		
 		String parametro = parametroDaModificare.toLowerCase().strip();
 		switch(parametro){
