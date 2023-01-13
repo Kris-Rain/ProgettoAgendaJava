@@ -2,6 +2,8 @@ package test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 
@@ -33,10 +35,10 @@ class TestAgenda {
 		
 		/*Testo se ho ordinato tramite costruttore*/
 		appuntamenti = lavoro.getAppuntamenti();
-		assertEquals("01-02-1998 12-30 60 Ufficio Capo\n", appuntamenti.get(0).toString());
-		assertEquals("01-02-1998 14-30 60 Ufficio Luca\n", appuntamenti.get(1).toString());
-		assertEquals("03-02-1998 11-30 60 Ufficio Luca\n", appuntamenti.get(2).toString());
-		assertEquals("03-02-1998 12-30 60 Ufficio Capo\n", appuntamenti.get(3).toString());	
+		assertEquals("01-02-1998|12-30|60min|Ufficio|Capo\n", appuntamenti.get(0).toString());
+		assertEquals("01-02-1998|14-30|60min|Ufficio|Luca\n", appuntamenti.get(1).toString());
+		assertEquals("03-02-1998|11-30|60min|Ufficio|Luca\n", appuntamenti.get(2).toString());
+		assertEquals("03-02-1998|12-30|60min|Ufficio|Capo\n", appuntamenti.get(3).toString());	
 		
 		/*Testo se aggiungendo un appuntamento non valido, costruisco un agenda vuota nonostante gli passi l'arraylist */
 		appuntamenti.add(new Appuntamento("01-02-1998", "14-30", "60", "Ufficio", "Luca"));
@@ -44,14 +46,22 @@ class TestAgenda {
 	}
 	
 	@Test
-	void testCostruttoreDaFile() {
-		/*test lettura da file*/
+	void testLeggiScriviSuFile() throws AppuntamentoException, IOException {
+		ArrayList<Appuntamento> appuntamenti = new ArrayList<>();
+		appuntamenti.add(new Appuntamento("01-02-1998", "09-00", "80", "Sala Conferenze", "Luca"));
+		appuntamenti.add(new Appuntamento("01-02-1998", "08-00", "45", "Viale Roma 22", "Giovanna Pascoli"));
+		appuntamenti.add(new Appuntamento("02-02-1998", "07-00", "30", "Casa Mia", "Me Stesso"));
+		appuntamenti.add(new Appuntamento("02-02-1998", "06-30", "30", "Casa Mia", "Me Stesso"));
+		appuntamenti.add(new Appuntamento("02-02-1998", "14-30", "60", "Ufficio", "Luca"));
+		appuntamenti.add(new Appuntamento("03-02-1998", "12-30", "60", "Ufficio", "Capo"));
+		Agenda agenda = new Agenda("Pippo", appuntamenti);
+		assertTrue(agenda.salvaAgendaSuFile());
+		System.out.print(new File(Agenda.PATHNAME, agenda.getNomeAgenda() + ".txt").getName());
+		Agenda agenda2 = new Agenda(new File(Agenda.PATHNAME, agenda.getNomeAgenda() + ".txt"));
+		assertTrue(agenda.equals(agenda2));
+		assertTrue(agenda2.salvaAgendaSuFile());
 	}
 	
-	@Test
-	void testSalvaAgendaSuFile() {
-		/*test scrittura su file*/
-	}
 	
 	@Test
 	void testSetNomeAgenda() {
@@ -233,12 +243,12 @@ class TestAgenda {
 		appuntamenti.add(new Appuntamento("03-02-1998", "06-30", "60", "Ufficio", "Luca"));
 		appuntamenti.add(new Appuntamento("01-02-1998", "07-20", "80", "Sala Conferenze", "Luca"));
 		Agenda agenda = new Agenda(appuntamenti);
-		assertEquals("01-02-1998 07-20 80 Sala Conferenze Luca\n"
-					+ "02-02-1998 14-30 60 Ufficio Luca\n"
-					+ "03-02-1998 06-30 60 Ufficio Luca\n", agenda.elencaPerPersona("luca"));
-		assertEquals("02-02-1998 06-30 30 Casa Mia Giacomo\n"
-					+ "02-02-1998 07-00 30 Casa Mia Giacomo\n", agenda.elencaPerPersona("GiAcomo"));
-		assertEquals("01-02-1998 06-30 45 Viale Roma 22 Giovanna Pascoli\n", agenda.elencaPerPersona("Giovanna Pascoli"));
+		assertEquals("01-02-1998|07-20|80min|Sala Conferenze|Luca\n"
+					+ "02-02-1998|14-30|60min|Ufficio|Luca\n"
+					+ "03-02-1998|06-30|60min|Ufficio|Luca\n", agenda.elencaPerPersona("luca"));
+		assertEquals("02-02-1998|06-30|30min|Casa Mia|Giacomo\n"
+					+ "02-02-1998|07-00|30min|Casa Mia|Giacomo\n", agenda.elencaPerPersona("GiAcomo"));
+		assertEquals("01-02-1998|06-30|45min|Viale Roma 22|Giovanna Pascoli\n", agenda.elencaPerPersona("Giovanna Pascoli"));
 		assertEquals("", agenda.elencaPerPersona("nome"));
 	}
 	
@@ -253,12 +263,12 @@ class TestAgenda {
 		appuntamenti.add(new Appuntamento("03-02-1998", "06-30", "60", "Ufficio", "Luca"));
 		appuntamenti.add(new Appuntamento("01-02-1998", "07-20", "80", "Sala Conferenze", "Luca"));
 		Agenda agenda = new Agenda(appuntamenti);
-		assertEquals("01-02-1998 06-30 45 Viale Roma 22 Giovanna Pascoli\n"
-					+ "01-02-1998 07-20 80 Sala Conferenze Luca\n", agenda.elencaPerData("01-02-1998"));
-		assertEquals("02-02-1998 06-30 30 Casa Mia Giacomo\n"
-					+ "02-02-1998 07-00 30 Casa Mia Giacomo\n"
-					+ "02-02-1998 14-30 60 Ufficio Luca\n", agenda.elencaPerData("02-02-1998"));
-		assertEquals("03-02-1998 06-30 60 Ufficio Luca\n", agenda.elencaPerData("03-02-1998"));
+		assertEquals("01-02-1998|06-30|45min|Viale Roma 22|Giovanna Pascoli\n"
+					+ "01-02-1998|07-20|80min|Sala Conferenze|Luca\n", agenda.elencaPerData("01-02-1998"));
+		assertEquals("02-02-1998|06-30|30min|Casa Mia|Giacomo\n"
+					+ "02-02-1998|07-00|30min|Casa Mia|Giacomo\n"
+					+ "02-02-1998|14-30|60min|Ufficio|Luca\n", agenda.elencaPerData("02-02-1998"));
+		assertEquals("03-02-1998|06-30|60min|Ufficio|Luca\n", agenda.elencaPerData("03-02-1998"));
 		assertEquals("", agenda.elencaPerData("05-02-1998"));
 	}
 	
@@ -274,12 +284,12 @@ class TestAgenda {
 		appuntamenti.add(new Appuntamento("01-02-1998", "07-20", "80", "Sala Conferenze", "Luca"));
 		Agenda agenda = new Agenda("Tutto", appuntamenti);
 		assertEquals("Agenda: Tutto\n"
-					+ "01-02-1998 06-30 45 Viale Roma 22 Giovanna Pascoli\n"
-					+ "01-02-1998 07-20 80 Sala Conferenze Luca\n"
-					+ "02-02-1998 06-30 30 Casa Mia Giacomo\n"
-					+ "02-02-1998 07-00 30 Casa Mia Giacomo\n"
-					+ "02-02-1998 14-30 60 Ufficio Luca\n"
-					+ "03-02-1998 06-30 60 Ufficio Luca\n", agenda.toString());
+					+ "01-02-1998|06-30|45min|Viale Roma 22|Giovanna Pascoli\n"
+					+ "01-02-1998|07-20|80min|Sala Conferenze|Luca\n"
+					+ "02-02-1998|06-30|30min|Casa Mia|Giacomo\n"
+					+ "02-02-1998|07-00|30min|Casa Mia|Giacomo\n"
+					+ "02-02-1998|14-30|60min|Ufficio|Luca\n"
+					+ "03-02-1998|06-30|60min|Ufficio|Luca\n", agenda.toString());
 		assertEquals("Agenda: Agenda Vuota\n", new Agenda("Agenda Vuota").toString());
 	}
 	
@@ -474,5 +484,24 @@ class TestAgenda {
 		});
 	}
 	
+	
+	@Test
+	void testCloneEquals() throws AppuntamentoException {
+		ArrayList<Appuntamento> appuntamenti = new ArrayList<>();
+		appuntamenti.add(new Appuntamento("02-02-2023", "14-30", "60", "Ufficio", "Luca"));
+		appuntamenti.add(new Appuntamento("01-02-2023", "06-30", "45", "Viale Roma 22", "Giovanna Pascoli"));
+		appuntamenti.add(new Appuntamento("02-02-2023", "07-00", "30", "Casa Mia", "Giacomo"));
+		appuntamenti.add(new Appuntamento("02-02-2023", "06-30", "30", "Ristorante", "Giacomo"));
+		appuntamenti.add(new Appuntamento("03-02-2023", "06-30", "60", "Ufficio", "Luca"));
+		appuntamenti.add(new Appuntamento("01-02-2023", "07-20", "80", "Sala Conferenze", "Luca"));
+		Agenda agenda1 = new Agenda(appuntamenti);
+		Agenda agenda2 = new Agenda("Pippo", appuntamenti);
+		Agenda agenda3 = new Agenda("Pippo");
+		
+		assertTrue(agenda1.equals(agenda1.clone()));
+		assertTrue(agenda2.equals(agenda2.clone()));
+		assertFalse(agenda1.equals(agenda2));
+		assertFalse(agenda2.equals(agenda3));
+	}
 
 }
