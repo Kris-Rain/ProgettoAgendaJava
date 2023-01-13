@@ -167,6 +167,10 @@ public class Appuntamento {
 		this.luogo=luogo;
 		this.nomePersona=nomePersona;
 	}
+
+	public Appuntamento(String[] parametri) throws AppuntamentoException {
+		this(parametri[0], parametri[1], parametri[2], parametri[3], parametri[4]);
+	}
 	
 	public String getData() {
 		return dataTimeInizio.getDataToString();
