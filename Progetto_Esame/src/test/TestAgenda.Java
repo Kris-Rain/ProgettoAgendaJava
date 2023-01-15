@@ -58,7 +58,7 @@ class TestAgenda {
 		assertFalse(agenda.isSaved());
 		assertTrue(agenda.salvaAgendaSuFile());
 		assertTrue(agenda.isSaved());
-		Agenda agenda2 = new Agenda(new File(Agenda.PATHNAME, agenda.getNomeAgenda() + ".txt"));
+		Agenda agenda2 = new Agenda(new File(Agenda.getFilesPath(), agenda.getNomeAgenda() + ".txt"));
 		assertTrue(agenda.isSaved());
 		assertTrue(agenda.equals(agenda2));
 		assertTrue(agenda2.salvaAgendaSuFile());
