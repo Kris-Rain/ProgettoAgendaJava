@@ -2,25 +2,23 @@ package codice;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 
 public class DataOrario {
 	
 	private LocalDate data;
 	private LocalTime orario;
-	private final static DateTimeFormatter formatterData = DateTimeFormatter.ofPattern("dd-MM-uuuu");
-	private final static DateTimeFormatter formatterTime = DateTimeFormatter.ofPattern("HH-mm");
+	private final static DateTimeFormatter formatterData = DateTimeFormatter.ofPattern("dd-MM-uuuu").withResolverStyle(ResolverStyle.STRICT);
+	private final static DateTimeFormatter formatterTime = DateTimeFormatter.ofPattern("HH-mm").withResolverStyle(ResolverStyle.STRICT);
 	
-	public DataOrario(LocalDate data, LocalTime orario) {
+	private DataOrario(LocalDate data, LocalTime orario) {
 		this.data = data;
 		this.orario = orario;
 	}
 	
-	public DataOrario(String data, String orario) {
+	public DataOrario(String data, String orario) throws DateTimeParseException {
 		this(LocalDate.parse(data, formatterData), LocalTime.parse(orario, formatterTime));
-	}
-	
-	public DataOrario() {	
-		this(LocalDate.now(), LocalTime.now());
 	}
 
 	public LocalDate getData() {
@@ -39,7 +37,6 @@ public class DataOrario {
 		return orario.format(formatterTime);
 	}
 	
-	
 	public DataOrario plusMinuti(String durata) {
 		LocalDateTime ldt = data.atTime(orario).plusMinutes(Long.parseLong(durata));
 		return new DataOrario(ldt.toLocalDate(), ldt.toLocalTime());
@@ -54,13 +51,9 @@ public class DataOrario {
 		return compareTo(new DataOrario(data, orario));
 	}
 	
-	public int compareTo(LocalDate data, LocalTime orario) {
-		return compareTo(new DataOrario(data, orario));
-	}
-	
 	@Override
 	public String toString() {
-		return data.format(formatterData) + " " + getOrarioToString();
+		return getDataToString() + " " + getOrarioToString();
 	}
 	
 	@Override
