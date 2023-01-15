@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -28,6 +29,9 @@ public class ContenitoreAgende implements Iterable <Agenda> {
 		return agende.size();
 	}
 	
+	public ArrayList<Agenda> getAgende() {
+		return agende;
+	}
 
 	public class IteratoreContenitoreAgende implements Iterator<Agenda> {
 		private int indiceAgende;
@@ -51,17 +55,52 @@ public class ContenitoreAgende implements Iterable <Agenda> {
 	}
 	
 	
-	public boolean aggiungiAgendaDaFile(String filePath) throws FileNotFoundException, IOException {
-		File file = new File(filePath);
-		
-		if(this.contains(file.getName())) return false;
-		
-		return agende.add(new Agenda(file));
+	public boolean caricaAgendaDaFile(String fileName) throws IOException {
+		File file = new File(Agenda.getFilesPath(), fileName);	
+		Agenda newAgenda = new Agenda(file);
+		return (this.contains(newAgenda.getNomeAgenda())) ? false : agende.add(newAgenda);
 	}
 	
 	
-	public void clear() {
-		agende.removeAll(agende);
+	public boolean caricaMultiAgendeDaFiles() throws IOException {
+		File cartella = new File(Agenda.getFilesPath());
+		if(!cartella.exists()) throw new FileNotFoundException("Impossibile trovare la cartella per il caricamento delle Agende.");
+		File[] listaFile = cartella.listFiles();
+		boolean risultatoFinale = true;
+		for(File file: listaFile) {
+			if(!file.isDirectory()) {
+				if(!caricaAgendaDaFile(file.getName())) risultatoFinale = false;
+			}
+		}
+		return risultatoFinale;
+	}
+	
+	
+	public boolean salvaAgendaSuFile(String nomeAgenda) throws IOException {
+		Agenda toSave;
+		try {
+			toSave = selezionaAgenda(nomeAgenda);
+		} catch(NoSuchElementException e) { return false; }
+		
+		return toSave.salvaAgendaSuFile();
+	}
+	
+	
+	public boolean salvaContenitoreSuFile() throws IOException {
+		for(Agenda elemento: this) {
+			if(!elemento.isSaved()) elemento.salvaAgendaSuFile();
+		}
+		return true;
+	}
+	
+	
+	public boolean allSaved() {
+		return agende.stream().allMatch( agenda -> agenda.isSaved() );
+	}
+	
+	
+	public boolean clear() {
+		return agende.removeAll(agende);
 	}
 	
 	
@@ -71,7 +110,6 @@ public class ContenitoreAgende implements Iterable <Agenda> {
 		}
 		throw new NoSuchElementException("Agenda non esiste!");
 	}
-	
 	
 	
 	private boolean actionToAgenda(String nomeAgenda, Predicate<Agenda> actionIfFound, Predicate<Agenda> actionIfNotFound) {
@@ -97,13 +135,28 @@ public class ContenitoreAgende implements Iterable <Agenda> {
 	public boolean removeAgenda(String nomeAgenda) {
 		return actionToAgenda(nomeAgenda, agenda -> agende.remove(agenda), agenda -> false);
 	}
+	
+	
+	public boolean aggiungiAgenda(Agenda toAdd) {
+		return (this.contains(toAdd.getNomeAgenda())) ? false : agende.add(toAdd);
+	}
 
+	
+	private String makeString(Function<Agenda, String> getString)  {
+		ArrayList<Agenda> elenco = new ArrayList<>(agende);
+		String finalString = "";
+		elenco.sort( (first, second) -> first.getNomeAgenda().compareTo(second.getNomeAgenda()));
+		for(Agenda elemento: elenco) finalString += getString.apply(elemento);
+		return finalString;
+	}
+	
+	public String elencaNomiAgende() {
+		return makeString( agenda -> agenda.getNomeAgenda() + "\n");
+	}
 	
 	@Override
 	public String toString() {
-		String stringaAgende = "";
-		for(Agenda agenda: this) stringaAgende+= agenda.toString() + "\n------------------------------------\n";
-		return stringaAgende;
+		return makeString( agenda -> agenda.toString() + "\n------------------------------------------\n\n");
 	}
 
 	@Override
