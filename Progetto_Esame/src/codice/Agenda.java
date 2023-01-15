@@ -30,7 +30,7 @@ public class Agenda implements Iterable<Appuntamento> {
 	private String nomeAgenda;
 	private ArrayList<Appuntamento> appuntamenti;
 	private boolean saved;
-	public static final String PATHNAME = "Agende_testuali/";
+	private static String textFilesPathName = "Agende_testuali/";
 	
 	
 	public class IteratoreAgenda implements Iterator<Appuntamento> {
@@ -105,13 +105,23 @@ public class Agenda implements Iterable<Appuntamento> {
 	    return filename.lastIndexOf(".") > 0 ? filename.substring(0, filename.lastIndexOf(".")) : filename;
 	}
 
-	public static void createPathToAgende() {
-		new File(PATHNAME).mkdirs();
+	public static boolean createPathToAgende() {
+		return new File(textFilesPathName).mkdirs();
+	}
+	
+	public static String changePathToAgende(String pathname) {
+		String oldPath = textFilesPathName;
+		textFilesPathName = pathname;
+		return oldPath;
+	}
+	
+	public static String getFilesPath() {
+		return textFilesPathName;
 	}
 	
 	public boolean salvaAgendaSuFile() throws IOException {
-		if(!new File(PATHNAME).exists()) createPathToAgende();
-		File file = new File(PATHNAME, nomeAgenda + ".txt");
+		if(!new File(textFilesPathName).exists()) createPathToAgende();
+		File file = new File(textFilesPathName, nomeAgenda + ".txt");
 		if(!file.exists()) file.createNewFile();
 		BufferedWriter br = new BufferedWriter(new FileWriter(file));
 		br.write(elencaAppuntamenti(appuntamenti));
@@ -137,6 +147,7 @@ public class Agenda implements Iterable<Appuntamento> {
 	public String getNomeAgenda() {
 		return nomeAgenda;
 	}
+	
 
 	public void setNomeAgenda(String nomeAgenda) {
 		this.nomeAgenda = nomeAgenda;
@@ -177,10 +188,7 @@ public class Agenda implements Iterable<Appuntamento> {
 	}
 	
 	public boolean isCompatible(Appuntamento appointment) {
-		for(Appuntamento elemento: this) {
-			if(!appointment.isCompatible(elemento))	return false;
-		}
-		return true;
+		return appuntamenti.stream().allMatch( elemento -> elemento.isCompatible(appointment) );
 	}
 	
 	
