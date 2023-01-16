@@ -91,6 +91,13 @@ class TestContenitoreAgende {
 		assertFalse(box.aggiungiAgenda(new Agenda("Pippo")));
 	}
 	
+	@Test
+	void testModificaNomeAgenda() {
+		assertTrue(box.modificaNomeAgenda("Varie", "Vario"));
+		assertTrue(box.modificaNomeAgenda("Personale", "Famiglia"));
+		assertFalse(box.modificaNomeAgenda("Personale", "Famiglia"));
+		assertFalse(box.modificaNomeAgenda("Non Esisto", "Esisto"));
+	}
 	
 	@Test
 	void testRimuoviAgenda() {
@@ -201,7 +208,7 @@ class TestContenitoreAgende {
 				
 			}
 		});
-			
+		
 		assertThrows(ConcurrentModificationException.class, () -> {
 			for(Agenda elemento: box) {
 				box.removeAgenda(elemento.getNomeAgenda());
