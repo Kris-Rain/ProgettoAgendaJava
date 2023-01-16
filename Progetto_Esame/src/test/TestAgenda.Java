@@ -86,8 +86,8 @@ class TestAgenda {
 		assertFalse(lavoro.contains(daNonInserire));
 		assertTrue(lavoro.contains("01-02-1998", "14-30"));
 		assertTrue(lavoro.contains("01-03-1998", "12-30"));
-		assertFalse(lavoro.contains("02-03-1998", "12-30"));
-		assertFalse(lavoro.contains("01-03-1998", "12-35"));
+		assertFalse(lavoro.contains("02-03-1998   12-30"));
+		assertFalse(lavoro.contains("01-03-1998 12-35"));
 	}
 	
 	
@@ -220,11 +220,11 @@ class TestAgenda {
 		appuntamenti.add(new Appuntamento("03-02-1998", "06-30", "60", "Ufficio", "Luca"));
 		Agenda agenda = new Agenda(appuntamenti);
 		
-		assertEquals(1, agenda.searchAppuntamentoPerDataOrario("01-02-1998", "06-30").size());
+		assertEquals(1, agenda.searchAppuntamentoPerDataOrario("01-02-1998   06-30").size());
 		assertEquals(1, agenda.searchAppuntamentoPerDataOrario("01-02-1998", "07-20").size());
-		assertEquals(1, agenda.searchAppuntamentoPerDataOrario("03-02-1998", "06-30").size());
+		assertEquals(1, agenda.searchAppuntamentoPerDataOrario("03-02-1998 06-30").size());
 		assertEquals(1, agenda.searchAppuntamentoPerDataOrario("02-02-1998", "06-30").size());
-		assertEquals(1, agenda.searchAppuntamentoPerDataOrario("02-02-1998", "07-00").size());
+		assertEquals(1, agenda.searchAppuntamentoPerDataOrario("02-02-1998  07-00").size());
 		assertEquals(1, agenda.searchAppuntamentoPerDataOrario("02-02-1998", "14-30").size());
 		
 		assertTrue(agenda.searchAppuntamentoPerDataOrario("02-02-1998", "17-30").isEmpty());
@@ -359,19 +359,35 @@ class TestAgenda {
 		assertEquals(5, agenda.getDimensioneAgenda());
 		assertFalse(agenda.rimuoviPerDataOrario("02-02-2023", "07-00"));
 		assertEquals(5, agenda.getDimensioneAgenda());
-		assertTrue(agenda.rimuoviPerDataOrario("02-02-2023", "06-30"));
+		assertTrue(agenda.rimuoviPerDataOrario("02-02-2023 06-30"));
 		assertEquals(4, agenda.getDimensioneAgenda());
 		assertTrue(agenda.rimuoviPerDataOrario("01-02-2023", "06-30"));
 		assertEquals(3, agenda.getDimensioneAgenda());
-		assertFalse(agenda.rimuoviPerDataOrario("01-02-2023", "06-30"));
+		assertFalse(agenda.rimuoviPerDataOrario("01-02-2023 06-30"));
 		assertEquals(3, agenda.getDimensioneAgenda());
 		assertTrue(agenda.rimuoviPerDataOrario("03-02-2023", "06-30"));
 		assertEquals(2, agenda.getDimensioneAgenda());
-		assertTrue(agenda.rimuoviPerDataOrario("02-02-2023", "14-30"));
+		assertTrue(agenda.rimuoviPerDataOrario("02-02-2023 14-30"));
 		assertEquals(1, agenda.getDimensioneAgenda());
 		assertFalse(agenda.rimuoviPerDataOrario("02-02-2023", "14-30"));
 		assertEquals(1, agenda.getDimensioneAgenda());
 		assertTrue(agenda.rimuoviPerDataOrario("01-02-2023", "07-20"));
+		assertEquals(0, agenda.getDimensioneAgenda());
+	}
+	
+	
+	@Test
+	void testRimuoviTutto() throws AppuntamentoException {
+		ArrayList<Appuntamento> appuntamenti = new ArrayList<>();
+		appuntamenti.add(new Appuntamento("02-02-2023", "14-30", "60", "Ufficio", "Luca"));
+		appuntamenti.add(new Appuntamento("01-02-2023", "06-30", "45", "Viale Roma 22", "Giovanna Pascoli"));
+		appuntamenti.add(new Appuntamento("02-02-2023", "07-00", "30", "Casa Mia", "Giacomo"));
+		appuntamenti.add(new Appuntamento("02-02-2023", "06-30", "30", "Ristorante", "Giacomo"));
+		appuntamenti.add(new Appuntamento("03-02-2023", "06-30", "60", "Ufficio", "Luca"));
+		appuntamenti.add(new Appuntamento("01-02-2023", "07-20", "80", "Sala Conferenze", "Luca"));
+		Agenda agenda = new Agenda(appuntamenti);
+		assertEquals(6, agenda.getDimensioneAgenda());
+		assertTrue( agenda.rimuoviTutto());
 		assertEquals(0, agenda.getDimensioneAgenda());
 	}
 	
@@ -387,8 +403,9 @@ class TestAgenda {
 		appuntamenti.add(new Appuntamento("01-02-2023", "07-20", "80", "Sala Conferenze", "Luca"));
 		Agenda agenda = new Agenda(appuntamenti);
 		
-		assertEquals(0, agenda.modificaAppuntamento("05-02-2023", "06-30", "data", "01-02-2023"));
+		assertEquals(0, agenda.modificaAppuntamento("05-02-2023 06-30", "data", "01-02-2023"));
 		assertEquals(0, agenda.modificaAppuntamento("02-02-2023", "00-30", "orario", "03-00"));
+		assertEquals(0, agenda.modificaAppuntamento("02-02-202307-00", "orario", "03-00"));
 		assertEquals(-2, agenda.modificaAppuntamento("02-02-2023", "07-00", "data", "00-00-0000"));
 		assertEquals(-2, agenda.modificaAppuntamento("02-02-2023", "07-00", "orario", "24-00"));
 		assertEquals(-2, agenda.modificaAppuntamento("02-02-2023", "07-00", "durata", "15.30"));
@@ -402,7 +419,7 @@ class TestAgenda {
 		assertEquals("Casa Giacomo", agenda.searchAppuntamentoPerDataOrario("02-02-2023", "07-00").get(0).getLuogo());
 		
 		assertEquals("Giacomo", agenda.searchAppuntamentoPerDataOrario("02-02-2023", "07-00").get(0).getPersona());
-		assertEquals(1, agenda.modificaAppuntamento("02-02-2023", "07-00", " persona", "Giacomino"));
+		assertEquals(1, agenda.modificaAppuntamento("02-02-2023 07-00", " persona", "Giacomino"));
 		assertEquals("Giacomino", agenda.searchAppuntamentoPerDataOrario("02-02-2023", "07-00").get(0).getPersona());
 		
 		assertTrue(agenda.searchAppuntamentoPerDataOrario("02-02-2023", "06-55").isEmpty());
@@ -415,7 +432,7 @@ class TestAgenda {
 		assertFalse(agenda.searchAppuntamentoPerDataOrario("01-02-2023", "06-30").isEmpty());
 		
 		assertTrue(agenda.searchAppuntamentoPerData("04-02-2023").isEmpty());
-		assertEquals(1, agenda.modificaAppuntamento("02-02-2023", "06-30", "data", "04-02-2023"));
+		assertEquals(1, agenda.modificaAppuntamento("02-02-2023   06-30", "data", "04-02-2023"));
 		assertFalse(agenda.searchAppuntamentoPerData("04-02-2023").isEmpty());
 		
 		assertEquals(-1, agenda.modificaAppuntamento("04-02-2023", "06-30", "data", "03-02-2023"));
@@ -429,7 +446,7 @@ class TestAgenda {
 		assertFalse(agenda.searchAppuntamentoPerDataOrario("04-02-2023", "05-30").isEmpty());
 		
 		assertEquals("08-40", agenda.searchAppuntamentoPerDataOrario("01-02-2023", "07-20").get(0).getDataTimeFine().getOrarioToString());
-		assertEquals(1, agenda.modificaAppuntamento("01-02-2023", "07-20", "DURATA", "120"));
+		assertEquals(1, agenda.modificaAppuntamento("01-02-2023   07-20", "DURATA", "120"));
 		assertEquals("09-20", agenda.searchAppuntamentoPerDataOrario("01-02-2023", "07-20").get(0).getDataTimeFine().getOrarioToString());
 		
 		assertEquals(1, agenda.modificaAppuntamento("01-02-2023", "07-20", "DURATA", "40"));
@@ -446,7 +463,7 @@ class TestAgenda {
 		assertFalse(agenda.searchAppuntamentoPerDataOrario("02-02-2023", "23-30").isEmpty());
 		assertEquals("03-02-2023", agenda.searchAppuntamentoPerDataOrario("02-02-2023", "23-30").get(0).getDataTimeFine().getDataToString());
 		assertEquals("00-30", agenda.searchAppuntamentoPerDataOrario("02-02-2023", "23-30").get(0).getDataTimeFine().getOrarioToString());
-		assertEquals(1, agenda.modificaAppuntamento("02-02-2023", "23-30", " durata ", "20"));
+		assertEquals(1, agenda.modificaAppuntamento("02-02-2023 23-30", " durata ", "20"));
 		assertEquals("02-02-2023", agenda.searchAppuntamentoPerDataOrario("02-02-2023", "23-30").get(0).getDataTimeFine().getDataToString());
 		assertEquals("23-50", agenda.searchAppuntamentoPerDataOrario("02-02-2023", "23-30").get(0).getDataTimeFine().getOrarioToString());	
 	}
@@ -536,6 +553,10 @@ class TestAgenda {
 		assertFalse(varie.isSaved());
 		assertTrue(varie.salvaAgendaSuFile());
 		assertTrue(varie.isSaved());
+		varie.setNomeAgenda("Vario");
+		assertFalse(varie.isSaved());
 	}
-
+	
+	
+	
 }
