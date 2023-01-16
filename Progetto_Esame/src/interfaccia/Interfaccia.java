@@ -1,19 +1,26 @@
 package interfaccia;
-
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.NoSuchElementException;
+import java.util.function.BiPredicate;
+
 import codice.*;
-import jbook.util.Input;
+import jbook.util.*;
+import codice.Appuntamento.ControlloDati;
+import codice.Appuntamento.ControlloDati.TipoControllo;
 
 public class Interfaccia {
-	private static ContenitoreAgende box=new ContenitoreAgende();
 	
-	private static boolean inizializzaAgende() throws IOException {
+	
+    public static ContenitoreAgende box = new ContenitoreAgende();
+
+    public static boolean inizializzaAgende() throws IOException {
 		Agenda.createPathToAgende();
 		return box.caricaMultiAgendeDaFiles();
 	}
 	
-	private static void menuAgende() throws IOException {
+	public static void menuAgende() {
 		System.out.println(box.elencaNomiAgende());
 		switch(Input.readString("1) Seleziona agenda\n2) Aggiungi agenda\n3) Rimuovi agenda\nq) Esci\n").toLowerCase()) {
 		case "1", "seleziona", "seleziona agenda" -> {
@@ -43,15 +50,12 @@ public class Interfaccia {
 		}
 	}
 	
-	private static boolean menuSingolaAgenda(Agenda agenda) {
-		return false;
-	}
 	
-	private static boolean rimuoviAgenda(Agenda agenda) {
+	public static boolean rimuoviAgenda(Agenda agenda) {
 		return box.removeAgenda(agenda.getNomeAgenda());
 	}
 	
-	private static boolean aggiungiAgenda() {
+	public static boolean aggiungiAgenda() {
 		while(true) {
 			switch(Input.readString("Creare una nuova agenda o importarla da file? ").toLowerCase()) {
 			case "crea", "creare", "crea agenda", "crea nuova agenda" -> {
@@ -70,49 +74,160 @@ public class Interfaccia {
 			}
 		}
 	}
-	
-	private static void abort(String message, IOException e) {
-		System.err.println(message);
-		e.printStackTrace();
-	}
-	
-	private static void terminate() throws IOException {
-		if(!box.allSaved()) {
-			if(askSomething("Alcune agende non sono state salvate, si desidera salvarle? ")) {
-				try {
-					box.salvaContenitoreSuFile();
+    
+    public static void menuSingolaAgenda(Agenda agenda) {
+    	System.out.println("\n\n---------------------------\nNome Agenda: " + agenda.getNomeAgenda() + "\nCosa si desidera fare? ");
+    	System.out.println("1) Crea Appuntamento\n"
+    			+ "2) Elimina Appuntamento\n"
+    			+ "3) Modifica Appuntamento\n"
+    			+ "4) Elenca Appuntamenti\n"
+    			+ "5) Salva Agenda\n"
+    			+ "r) Ritorna al menù precedente");
+
+    	while(true) {
+    		String scelta = Input.readString("Inserire un'opzione: ");
+        	switch(scelta.strip().toLowerCase()) {
+        		case "1", "crea", "crea appuntamento" -> creaAppuntamento(agenda);
+        		case "2", "elimina", "elimina appuntamento" -> rimuoviAppuntamento(agenda);
+        		case "3", "modifica", "modifica appuntamento" -> modificaAppuntamento(agenda);
+        		case "4", "elenca", "elenca appuntamenti" -> System.out.println(agenda.toString());
+        		case "5", "salva", "salva agenda" -> {
+        			try { 
+        				agenda.salvaAgendaSuFile();
+        				System.out.println("*** Salvataggio Agenda su file avvenuto con successo ***");
+					} catch (IOException e) {
+						System.err.println("ATTENZIONE: salvataggio agenda su file non riuscito.");
+					}
+        		}
+        		case "r", "ritorna", "return" -> { return; }
+        		default -> System.out.println("Attenzione, la scelta effettuata non è valida.");
+        	}
+    	}
+    	
+    }
+    
+    private static String controlloDatoAppuntamento(TipoControllo tc, String request, String errMessage) {
+    	String result;
+    	boolean pass = false;
+    	do {
+    		result = Input.readString(request).strip();
+    		pass = ControlloDati.controlloPer(tc, result);
+    		if(!pass) System.out.println(errMessage);
+    	}	while(!pass);
+    	return result;
+    }
+    
+    
+    public static void creaAppuntamento(Agenda agenda) {
+    	String[] parametri = new String[5];
+    	HashMap<TipoControllo, RequestApp> requests = new HashMap<>();
+    	requests.put(TipoControllo.CONTROLLO_DATA, new RequestApp("Inserire una data valida nel formato dd-MM-aaaa: ", "La data non è valida!"));
+    	requests.put(TipoControllo.CONTROLLO_ORARIO, new RequestApp("Inserire un orario valido nel formato HH-mm: ", "L'orario non è valido!"));
+    	requests.put(TipoControllo.CONTROLLO_DURATA, new RequestApp("Inserire una durata in minuti valida (solo valori interi): ", "La durata non è valida!"));
+    	requests.put(TipoControllo.CONTROLLO_LUOGO, new RequestApp("Inserire il nome di un luogo valido (sono ammessi nomi propri o indirizzi): ", "Il luogo non è valido!"));
+    	requests.put(TipoControllo.CONTROLLO_NOME, new RequestApp("Inserire il nome della persona con cui si ha l'appuntamento (ammessi solo caratteri alfanumerici): ", "Il nome non è valido!"));
+    	int index = 0;
+    	for(TipoControllo tc : TipoControllo.values()) {
+    		parametri[index++] = controlloDatoAppuntamento(tc, requests.get(tc).getRequest(), requests.get(tc).getErrMessage());
+    	}
+    	agenda.aggiungiAppuntamento(parametri[0], parametri[1], parametri[2], parametri[3], parametri[4]);
+    	System.out.println("*** Appuntamento aggiunto con successo ***");
+    }
+    
+    
+    private static void rimuoviPer(Agenda agenda, String request, BiPredicate<Agenda, String> removeMethod) {
+    	String value = Input.readString(request).strip();
+		ArrayList<Appuntamento> result = agenda.searchAppuntamentoPerData(value);
+		if(result.isEmpty()) System.out.println("Attenzione: Appuntamento/i non esistenti nell'Agenda.");
+		else if(askSomething("Appuntamento/i trovati. Sei sicuro di voler procedere all'eliminazione? ")) {
+				removeMethod.test(agenda, value);
+				System.out.println("*** Rimozione completata ***");
+		} 
+		else System.out.println("*** Rimozione annullata ***");
+    }
+    
+    public static void rimuoviAppuntamento(Agenda agenda) {
+    	System.out.println("1) Rimuovi secondo data\n2) Rimuovi secondo persona\n3) Rimuovi secondo data orario\n4) Rimuovi tutto\nr) Annulla");
+    	while(true) {
+			String scelta = Input.readString("Inserire come si desidera procedere: ").strip().toLowerCase();
+			switch(scelta) {
+				case "1", "data", "rimuovi data", "rimuovi secondo data" -> rimuoviPer(agenda, "Inserire la data: ", (diary, data) -> diary.rimuoviPerData(data));
+				case "2", "persona", "rimuovi persona", "rimuovi secondo persona" -> rimuoviPer(agenda, "Inserire la data: ", (diary, data) -> diary.rimuoviPerPersona(data));
+				case "3", "data orario", "rimuovi data orario", "rimuovi secondo data orario" ->  rimuoviPer(agenda, "Inserire la data e l'orario (separati da almeno uno spazio): ", (diary, dataOrario) -> diary.rimuoviPerDataOrario(dataOrario));
+				case "4", "tutto", "rimuovi tutto" -> {
+					if(askSomething("Sei sicuro di voler eliminare tutti gli appuntamenti? ")) {
+						agenda.rimuoviTutto();
+						System.out.println("*** Appuntamenti eliminati ***");
+					} else System.out.println("*** Scelta annullata ***");
 				}
-				catch(IOException e) {
-					abort("ATTENZIONE! Salvataggio agende fallito!", e);
-				}
+				case "r", "annulla" -> { return; }
 			}
-		}
-		System.exit(0);
-	}
-	
-	public static boolean askSomething(String question) {
+    	}			
+    }
+    
+    
+    public static void modificaAppuntamento(Agenda agenda) {
+    	boolean repeat = true;
+    	do {
+    		int risultato = agenda.modificaAppuntamento(
+    				Input.readString("Inserire data e orario dell'appuntamento da modificare (separati da spazio): ").strip(),
+    				Input.readString("Inserire nome parametro da modificare (data, orario, durata, luogo, persona): "),
+    				Input.readString("Inserire nuovo valore da inserire: ").strip());
+    		switch(risultato) {
+    			case 0 -> System.out.println("Attenzione: l'Appuntamento selezionato non è esistente.");
+    			case 1 -> System.out.println("*** Modifica avvenuta con successo ***");
+    			case -1 -> System.out.println("Attenzione: non è stato possibile modificare l'appuntamento poiché l'avrebbe reso non compatibile con l'Agenda.");
+    			case -2 -> System.out.println("Attenzione: uno o più parametri inseriti non sono nel formato corretto");
+    			case -3 -> System.out.println("Attenzione: il nome del parametro da modificare non identifica alcun campo.");
+    		}
+    		if(risultato != 1) repeat = askSomething("Si desidera riprovare la modifica? "); else repeat = false;	
+    	} while(repeat);
+    }
+    
+    
+    
+    public static void terminate() {
+    	if(!box.allSaved()) {
+    		if(askSomething("Alcune agende non sono state salvate, si desidera salvarle? ")) {
+    			try {
+    				box.salvaContenitoreSuFile();
+    			} catch(IOException e) { abort("ATTENZIONE: salvataggio agende fallito.", e); }
+    		}
+    	}
+    	System.exit(0);
+    }
+    
+    public static void abort(String message, IOException e) {
+    	System.err.println(message);
+		e.printStackTrace();
+		System.exit(1); 
+    }
+    
+    public static boolean askSomething(String question) {
         Boolean conferma = null;
         do {
             String risposta = Input.readString(question).strip().toLowerCase();
             switch(risposta) {
-                case "y", "yes", "ye", "yeah", "yea", "si", "sì", "affermative" -> conferma = true;
-                case "n", "no", "nop", "nope", "non", "not", "negative" -> conferma = false;
+                case "y", "yes", "ye", "yeah", "yea", "si", "sì", "ja", "oui", "affermative" -> conferma = true;
+                case "n", "no", "nop", "nope", "non", "not", "nein", "negative" -> conferma = false;
                 default -> System.out.println("Scelta non valida!");
             }
         } while(conferma == null);
 
         return conferma;
     }
+    
+    public static void main(String[] args) {
+    	try {	
+    		if(!inizializzaAgende()) System.out.println("Attenzione: non è stato possibile caricare alcune agende.");
+    	} catch(IOException e) { 
+    		abort("ATTENZIONE! Impossibile inizializzare:", e);
+    	}
+    	while(true) {
+    		menuAgende();
+    	}
+    }
 	
-	public static void main(String[] args) throws IOException {
-		try {
-			if(!inizializzaAgende()) System.out.println("ATTENZIONE! Non è stato possibile caricare alcune agende!");
-		}
-		catch(IOException e) {
-			abort("ATTENZIONE! Impossibile inizializzare:", e);
-		}
-		while(true) {
-			menuAgende();
-		}
-	}
+	
+	
 }
