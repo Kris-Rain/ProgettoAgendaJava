@@ -127,6 +127,17 @@ public class ContenitoreAgende implements Iterable <Agenda> {
 	}
 	
 	
+	public boolean modificaNomeAgenda(String nomeAgenda, String newName) {
+		if(!agende.stream().anyMatch( agenda -> agenda.getNomeAgenda().equals(newName))) {
+			try {
+				Agenda agenda = selezionaAgenda(nomeAgenda);
+				agenda.setNomeAgenda(newName);
+				return true;
+			} catch(NoSuchElementException e) { return false; }
+		}
+		return false;
+	}
+	
 	public boolean aggiungiAgenda(String nomeAgenda) {
 		return actionToAgenda(nomeAgenda, agenda -> false, agenda -> agende.add(agenda));
 	}
