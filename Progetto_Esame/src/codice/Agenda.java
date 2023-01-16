@@ -151,6 +151,7 @@ public class Agenda implements Iterable<Appuntamento> {
 
 	public void setNomeAgenda(String nomeAgenda) {
 		this.nomeAgenda = nomeAgenda;
+		saved = false;
 	}
 
 	public ArrayList<Appuntamento> getAppuntamenti() {
@@ -179,12 +180,22 @@ public class Agenda implements Iterable<Appuntamento> {
 	}
 	
 	
+	public ArrayList<Appuntamento> searchAppuntamentoPerDataOrario(String dataOrario) {
+		String[] parametri = dataOrarioSplit(dataOrario);
+		return searchAppuntamentoGenerico( appuntamento -> appuntamento.matchDataOrario(parametri[0], parametri[1]));
+	}
+	
+	
 	public boolean contains(Appuntamento app) {
 		return appuntamenti.contains(app);
 	}
 	
 	public boolean contains(String data, String orario) {
 		return !searchAppuntamentoPerDataOrario(data, orario).isEmpty();
+	}
+	
+	public boolean contains(String dataOrario) {
+		return !searchAppuntamentoPerDataOrario(dataOrario).isEmpty();
 	}
 	
 	public boolean isCompatible(Appuntamento appointment) {
@@ -254,45 +265,16 @@ public class Agenda implements Iterable<Appuntamento> {
 		return rimuoviGenerico( () -> appuntamenti.removeAll(searchAppuntamentoPerDataOrario(data, orario)));
 	}
 	
-	/*
-	public int modificaAppuntamento(String dataApp, String orarioApp, String parametroDaModificare, String newValue) {
-		ArrayList<Appuntamento> risultato = searchAppuntamentoPerDataOrario(dataApp, orarioApp);
-		if(risultato.isEmpty()) return 0;
-		Appuntamento vecchioAppuntamento = risultato.get(0);
-		
-		String[] parametri = {
-				vecchioAppuntamento.getData(),
-				vecchioAppuntamento.getOrario(),
-				vecchioAppuntamento.getDurata(),
-				vecchioAppuntamento.getLuogo(),
-				vecchioAppuntamento.getPersona()
-		};
-
-		switch(parametroDaModificare.toLowerCase().strip()) {
-			case "data" -> parametri[0] = newValue;
-			case "orario" -> parametri[1] = newValue; 
-			case "durata" -> parametri[2] = newValue; 
-			case "luogo" -> parametri[3] = newValue; 
-			case "persona" -> parametri[4] = newValue; 
-			default -> { return -3; }
-		}
-
-		try {	
-			Appuntamento nuovoAppuntamento = new Appuntamento(parametri[0], parametri[1], parametri[2], parametri[3], parametri[4]);
-			appuntamenti.set(appuntamenti.indexOf(vecchioAppuntamento), nuovoAppuntamento);
-			if(!isAgenda(appuntamenti))  {
-				appuntamenti.set(appuntamenti.indexOf(nuovoAppuntamento), vecchioAppuntamento);
-				ordinaAppuntamenti(appuntamenti);
-				return -1;
-			}
-				
-			return 1;
-		} 
-		catch(AppuntamentoException e) {
-			return -2;
-		}
+	
+	public boolean rimuoviPerDataOrario(String dataOrario) {
+		return rimuoviGenerico( () -> appuntamenti.removeAll(searchAppuntamentoPerDataOrario(dataOrario)));
 	}
-	*/
+	
+	
+	public boolean rimuoviTutto() {
+		return appuntamenti.removeAll(appuntamenti);
+	}
+
 	
 	private int testModifica(Appuntamento oldApp, String newValue, String flag) {
 		try {
@@ -337,6 +319,11 @@ public class Agenda implements Iterable<Appuntamento> {
 		}
 	}
 	
+	public int modificaAppuntamento(String dataOrarioApp, String parametroDaModificare, String newValue) {
+		String[] splittati = dataOrarioSplit(dataOrarioApp);
+		return modificaAppuntamento(splittati[0], splittati[1], parametroDaModificare, newValue);
+	}
+	
 	public boolean isSaved() {
 		return saved;
 	}
@@ -359,5 +346,10 @@ public class Agenda implements Iterable<Appuntamento> {
 		return (other.getNomeAgenda().equals(this.nomeAgenda) && this.appuntamenti.equals(other.getAppuntamenti()));
 	}
 	
+	
+	private String[] dataOrarioSplit(String dataOrario) {
+		String[] splitted = dataOrario.split("(\\s)+");
+		return splitted.length == 1 ? new String[] {dataOrario, ""} : splitted;
+	}
 	
 }
