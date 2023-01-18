@@ -1,3 +1,9 @@
+/**
+ * @author Nicolò Bianchetto
+ * @author Kristian Rigo
+ */
+
+
 package codice;
 
 import java.io.BufferedReader;
@@ -14,16 +20,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-
-
-/**
- * 
- * @author Nicolò Bianchetto
- * @author Kristian Rigo
- * 
- * 
- * 
- */
+import jbook.util.PatternMatcher;
 
 public class Agenda implements Iterable<Appuntamento> {
 	
@@ -94,7 +91,7 @@ public class Agenda implements Iterable<Appuntamento> {
 			} 	
 		reader.close();	
 		ordinaAppuntamenti(appuntamenti);
-		saved = true;
+		if(PatternMatcher.create(".*\\.txt$", file.getName()).matches()) saved = true; else saved = false;
 		/* Nel peggiore dei casi, se non riesco a leggere nessuna riga, creo una Agenda vuota. 
 		 * Lancio un'eccezione solo se il file non esiste o ho avuto IOException
 		 */
@@ -162,7 +159,6 @@ public class Agenda implements Iterable<Appuntamento> {
 		return appuntamenti.size();
 	}
 
-	
 	private ArrayList<Appuntamento> searchAppuntamentoGenerico(Predicate <Appuntamento> predicato) {
 		return (ArrayList<Appuntamento>) appuntamenti.stream().filter(predicato).collect(Collectors.toList());
 	}
