@@ -1,3 +1,9 @@
+/**
+ * @author Nicolò Bianchetto
+ * @author Kristian Rigo
+ */
+
+
 package codice;
 
 import java.io.File;
@@ -9,11 +15,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.function.Function;
 import java.util.function.Predicate;
-
-/**
- * @author Kristian Rigo
- * @author Nicolò Bianchetto
- */
+import jbook.util.PatternMatcher;
 
 public class ContenitoreAgende implements Iterable <Agenda> {
 	
@@ -68,7 +70,7 @@ public class ContenitoreAgende implements Iterable <Agenda> {
 		File[] listaFile = cartella.listFiles();
 		boolean risultatoFinale = true;
 		for(File file: listaFile) {
-			if(!file.isDirectory()) {
+			if(!file.isDirectory() && PatternMatcher.create(".*\\.txt$", file.getName()).matches()) {
 				if(!caricaAgendaDaFile(file.getName())) risultatoFinale = false;
 			}
 		}
@@ -162,7 +164,7 @@ public class ContenitoreAgende implements Iterable <Agenda> {
 	}
 	
 	public String elencaNomiAgende() {
-		return makeString( agenda -> agenda.getNomeAgenda() + "\n");
+		return makeString( agenda -> "- "+agenda.getNomeAgenda() + (agenda.isSaved() ? "":"*") + "\n");
 	}
 	
 	@Override
