@@ -1,17 +1,21 @@
+/**
+ * @author Nicolò Bianchetto
+ * @author Kristian Rigo
+ */
+
 package interfaccia;
+
+import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.function.BiPredicate;
-
 import codice.*;
 import jbook.util.*;
 import codice.Appuntamento.ControlloDati;
 import codice.Appuntamento.ControlloDati.TipoControllo;
 
 public class Interfaccia {
-	
 	
     public static ContenitoreAgende box = new ContenitoreAgende();
 
@@ -21,15 +25,15 @@ public class Interfaccia {
 	}
 	
 	public static void menuAgende() {
-		System.out.println(box.elencaNomiAgende());
-		switch(Input.readString("1) Seleziona agenda\n2) Aggiungi agenda\n3) Rimuovi agenda\nq) Esci\n").toLowerCase()) {
+		System.out.println("Agende:\n"+box.elencaNomiAgende());
+		switch(Input.readString("1) Seleziona agenda\n2) Aggiungi agenda\n3) Rimuovi agenda\nq) Esci\nInserire un'opzione: ").toLowerCase()) {
 		case "1", "seleziona", "seleziona agenda" -> {
 			String selected=Input.readString("Digitare l'agenda desiderata (in modo preciso): ");
 			try {
 				menuSingolaAgenda(box.selezionaAgenda(selected));
 			}
 			catch(NoSuchElementException e) {
-				System.err.println("L'agenda non esiste!");
+				System.out.println("L'agenda non esiste!");
 			}
 		}
 		case "2", "aggiungi", "aggiungi agenda" -> {
@@ -50,9 +54,17 @@ public class Interfaccia {
 		}
 	}
 	
-	
-	public static boolean rimuoviAgenda(Agenda agenda) {
-		return box.removeAgenda(agenda.getNomeAgenda());
+	public static void rimuoviAgenda(Agenda agenda) {
+		if(askSomething("Sei sicuro di voler rimuovere l'agenda? ")) {
+			if(agenda.isSaved() && askSomething("Vuoi eliminare anche il file? ")) {
+				if(new File(Agenda.getFilesPath(), agenda.getNomeAgenda()+".txt").delete()) System.out.println("\n*** Eliminazione del file avvenuta con successo ***");
+				else System.out.println("*** Impossibile eliminare il file! ***\n");
+			}
+			box.removeAgenda(agenda.getNomeAgenda());
+			System.out.println("*** Rimozione agenda avvenuta con successo ***\n");
+			
+		}
+		else System.out.println("*** Rimozione annullata ***\n");
 	}
 	
 	public static boolean aggiungiAgenda() {
@@ -70,26 +82,27 @@ public class Interfaccia {
 					return false;
 				}
 			}
-			default -> System.out.println("Selezione non disponibile! Riprovare");
+			default -> System.out.println("Attenzione, la scelta effettuata non è valida.");
 			}
 		}
 	}
     
     public static void menuSingolaAgenda(Agenda agenda) {
-    	System.out.println("\n\n---------------------------\nNome Agenda: " + agenda.getNomeAgenda() + "\nCosa si desidera fare? ");
-    	System.out.println("1) Crea Appuntamento\n"
-    			+ "2) Elimina Appuntamento\n"
-    			+ "3) Modifica Appuntamento\n"
-    			+ "4) Elenca Appuntamenti\n"
-    			+ "5) Salva Agenda\n"
-    			+ "r) Ritorna al menù precedente");
-
     	while(true) {
+    		System.out.println("\n\n---------------------------\nNome Agenda: " + agenda.getNomeAgenda() + "\nCosa si desidera fare? ");
+        	System.out.println("1) Crea Appuntamento\n"
+        			+ "2) Elimina Appuntamento\n"
+        			+ "3) Modifica Appuntamento\n"
+        			+ "4) Elenca Appuntamenti\n"
+        			+ "5) Salva Agenda\n"
+        			+ "6) Modifica nome Agenda\n"
+        			+ "r) Ritorna al menù precedente\n");
+        	
     		String scelta = Input.readString("Inserire un'opzione: ");
         	switch(scelta.strip().toLowerCase()) {
         		case "1", "crea", "crea appuntamento" -> creaAppuntamento(agenda);
         		case "2", "elimina", "elimina appuntamento" -> rimuoviAppuntamento(agenda);
-        		case "3", "modifica", "modifica appuntamento" -> modificaAppuntamento(agenda);
+        		case "3", "modifica appuntamento" -> modificaAppuntamento(agenda);
         		case "4", "elenca", "elenca appuntamenti" -> System.out.println(agenda.toString());
         		case "5", "salva", "salva agenda" -> {
         			try { 
@@ -99,11 +112,17 @@ public class Interfaccia {
 						System.err.println("ATTENZIONE: salvataggio agenda su file non riuscito.");
 					}
         		}
+        		case "6", "modifica", "modifica nome", "modifica nome agenda" -> modificaNomeAgenda(agenda);
         		case "r", "ritorna", "return" -> { return; }
         		default -> System.out.println("Attenzione, la scelta effettuata non è valida.");
         	}
     	}
-    	
+    }
+    
+    public static void modificaNomeAgenda(Agenda agenda) {
+        if(box.modificaNomeAgenda(agenda.getNomeAgenda(), Input.readString("Inserire il nuovo nome: "))) {
+            System.out.println(" Nuovo nome impostato con successo: " + agenda.getNomeAgenda() + "");
+        } else System.out.println("Modifica non riuscita: il nome inserito è già esistente ");
     }
     
     private static String controlloDatoAppuntamento(TipoControllo tc, String request, String errMessage) {
@@ -117,7 +136,6 @@ public class Interfaccia {
     	return result;
     }
     
-    
     public static void creaAppuntamento(Agenda agenda) {
     	String[] parametri = new String[5];
     	HashMap<TipoControllo, RequestApp> requests = new HashMap<>();
@@ -130,15 +148,14 @@ public class Interfaccia {
     	for(TipoControllo tc : TipoControllo.values()) {
     		parametri[index++] = controlloDatoAppuntamento(tc, requests.get(tc).getRequest(), requests.get(tc).getErrMessage());
     	}
-    	agenda.aggiungiAppuntamento(parametri[0], parametri[1], parametri[2], parametri[3], parametri[4]);
-    	System.out.println("*** Appuntamento aggiunto con successo ***");
+    	if(agenda.aggiungiAppuntamento(parametri[0], parametri[1], parametri[2], parametri[3], parametri[4])) System.out.println("*** Appuntamento aggiunto con successo ***");
+    	else System.out.println("Attenzione: appuntamento non compatibile con l'agenda");
+
     }
     
-    
-    private static void rimuoviPer(Agenda agenda, String request, BiPredicate<Agenda, String> removeMethod) {
+    private static void rimuoviPer(Agenda agenda, String request, BiPredicate<Agenda, String> removeMethod, BiPredicate<Agenda, String> isEmpty) {
     	String value = Input.readString(request).strip();
-		ArrayList<Appuntamento> result = agenda.searchAppuntamentoPerData(value);
-		if(result.isEmpty()) System.out.println("Attenzione: Appuntamento/i non esistenti nell'Agenda.");
+		if(isEmpty.test(agenda, value)) System.out.println("Attenzione: Appuntamento/i non esistenti nell'Agenda.");
 		else if(askSomething("Appuntamento/i trovati. Sei sicuro di voler procedere all'eliminazione? ")) {
 				removeMethod.test(agenda, value);
 				System.out.println("*** Rimozione completata ***");
@@ -148,29 +165,26 @@ public class Interfaccia {
     
     public static void rimuoviAppuntamento(Agenda agenda) {
     	System.out.println("1) Rimuovi secondo data\n2) Rimuovi secondo persona\n3) Rimuovi secondo data orario\n4) Rimuovi tutto\nr) Annulla");
-    	while(true) {
-			String scelta = Input.readString("Inserire come si desidera procedere: ").strip().toLowerCase();
-			switch(scelta) {
-				case "1", "data", "rimuovi data", "rimuovi secondo data" -> rimuoviPer(agenda, "Inserire la data: ", (diary, data) -> diary.rimuoviPerData(data));
-				case "2", "persona", "rimuovi persona", "rimuovi secondo persona" -> rimuoviPer(agenda, "Inserire la data: ", (diary, data) -> diary.rimuoviPerPersona(data));
-				case "3", "data orario", "rimuovi data orario", "rimuovi secondo data orario" ->  rimuoviPer(agenda, "Inserire la data e l'orario (separati da almeno uno spazio): ", (diary, dataOrario) -> diary.rimuoviPerDataOrario(dataOrario));
-				case "4", "tutto", "rimuovi tutto" -> {
-					if(askSomething("Sei sicuro di voler eliminare tutti gli appuntamenti? ")) {
-						agenda.rimuoviTutto();
-						System.out.println("*** Appuntamenti eliminati ***");
-					} else System.out.println("*** Scelta annullata ***");
-				}
-				case "r", "annulla" -> { return; }
+		String scelta = Input.readString("Inserire come si desidera procedere: ").strip().toLowerCase();
+		switch(scelta) {
+			case "1", "data", "rimuovi data", "rimuovi secondo data" -> rimuoviPer(agenda, "Inserire la data: ", (diary, data) -> diary.rimuoviPerData(data), (diary, data) -> diary.searchAppuntamentoPerData(data).isEmpty());
+			case "2", "persona", "rimuovi persona", "rimuovi secondo persona" -> rimuoviPer(agenda, "Inserire la persona: ", (diary, persona) -> diary.rimuoviPerPersona(persona), (diary, persona) -> diary.searchAppuntamentoPerPersona(persona).isEmpty());
+			case "3", "data orario", "rimuovi data orario", "rimuovi secondo data orario" ->  rimuoviPer(agenda, "Inserire la data e l'orario (separati da almeno uno spazio): ", (diary, dataOrario) -> diary.rimuoviPerDataOrario(dataOrario), (diary, dataOrario) -> diary.searchAppuntamentoPerDataOrario(dataOrario).isEmpty());
+			case "4", "tutto", "rimuovi tutto" -> {
+				if(askSomething("Sei sicuro di voler eliminare tutti gli appuntamenti? ")) {
+					agenda.rimuoviTutto();
+					System.out.println("*** Appuntamenti eliminati ***");
+				} else System.out.println("*** Scelta annullata ***");
 			}
-    	}			
+			case "r", "annulla" -> { return; }
+		}
     }
-    
     
     public static void modificaAppuntamento(Agenda agenda) {
     	boolean repeat = true;
     	do {
     		int risultato = agenda.modificaAppuntamento(
-    				Input.readString("Inserire data e orario dell'appuntamento da modificare (separati da spazio): ").strip(),
+    				Input.readString("Inserire \"DATA ORARIO\" dell'appuntamento da modificare (separati da spazio): ").strip(),
     				Input.readString("Inserire nome parametro da modificare (data, orario, durata, luogo, persona): "),
     				Input.readString("Inserire nuovo valore da inserire: ").strip());
     		switch(risultato) {
@@ -184,13 +198,12 @@ public class Interfaccia {
     	} while(repeat);
     }
     
-    
-    
     public static void terminate() {
     	if(!box.allSaved()) {
     		if(askSomething("Alcune agende non sono state salvate, si desidera salvarle? ")) {
     			try {
     				box.salvaContenitoreSuFile();
+    				System.out.println("*** Salvataggio delle agende avvenuto con successo ***");
     			} catch(IOException e) { abort("ATTENZIONE: salvataggio agende fallito.", e); }
     		}
     	}
@@ -227,7 +240,4 @@ public class Interfaccia {
     		menuAgende();
     	}
     }
-	
-	
-	
 }
