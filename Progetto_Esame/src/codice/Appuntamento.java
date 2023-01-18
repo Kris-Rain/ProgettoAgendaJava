@@ -149,7 +149,7 @@ public class Appuntamento {
 			return controlliMappati.get(tc).test(stringa);
 		}
 		
-		public static void testParametri(String data, String orario, String durata, String luogo, String nome) throws AppuntamentoException {
+		private static void testParametri(String data, String orario, String durata, String luogo, String nome) throws AppuntamentoException {
 			HashMap<TipoControllo, ControlloMappato> controlliMappati = creaControlliMappati();
 			String[] parametri = { data, orario, durata, luogo, nome };
 			int indice = 0;
