@@ -71,6 +71,8 @@ class TestAgenda {
 		assertEquals("Test", test.getNomeAgenda());
 		test.setNomeAgenda("Toast");
 		assertEquals("Toast", test.getNomeAgenda());
+		test.setNomeAgenda("");
+		assertEquals("Agenda", test.getNomeAgenda());
 	}
 	
 	@Test
