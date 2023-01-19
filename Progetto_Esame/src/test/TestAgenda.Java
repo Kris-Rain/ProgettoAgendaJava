@@ -155,10 +155,10 @@ class TestAgenda {
 		assertFalse(lavoro.aggiungiAppuntamento(new Appuntamento("04-02-1998", "17-19", "15", "Casa Giovanni", "Giovanni")));
 		assertEquals(2, lavoro.getDimensioneAgenda());
 		
-		assertTrue(lavoro.aggiungiAppuntamento("31-10-2020", "23-30", "120", "Casa Paolo", "Paolo"));
-		assertTrue(lavoro.aggiungiAppuntamento("01-11-2020", "04-00", "30", "Aeroporto", "Giovanna"));
-		assertTrue(lavoro.aggiungiAppuntamento("01-11-2020", "02-00", "20", "Casa mia", "Io"));
-		assertTrue(lavoro.aggiungiAppuntamento("01-11-2020", "01-30", "15", "Casa Paolo", "Paolo"));
+		assertTrue(lavoro.aggiungiAppuntamento("31-10-2020 23-30", "120", "Casa Paolo", "Paolo"));
+		assertTrue(lavoro.aggiungiAppuntamento("01-11-2020      04-00", "30", "Aeroporto", "Giovanna"));
+		assertTrue(lavoro.aggiungiAppuntamento("01-11-2020 02-00", "20", "Casa mia", "Io"));
+		assertTrue(lavoro.aggiungiAppuntamento("01-11-2020   01-30", "15", "Casa Paolo", "Paolo"));
 		assertTrue(lavoro.aggiungiAppuntamento("01-11-2020", "03-45", "15", "Aeroporto Parcheggio", "Giovanna"));
 		assertEquals(7, lavoro.getDimensioneAgenda());
 		
@@ -490,6 +490,16 @@ class TestAgenda {
 		});
 		
 		
+		assertDoesNotThrow( () -> {
+			for(Appuntamento elemento: agenda) {
+				for(Appuntamento elemento2: agenda.clone()) {
+					elemento.matchData(elemento2.getData());
+				}
+				
+			}
+		});
+		
+		
 		assertThrows(ConcurrentModificationException.class, () -> {
 			for(Appuntamento elemento: agenda) {
 				agenda.rimuoviPerData(elemento.getData());
@@ -555,8 +565,8 @@ class TestAgenda {
 		assertTrue(varie.isSaved());
 		varie.setNomeAgenda("Vario");
 		assertFalse(varie.isSaved());
-	}
-	
-	
+		assertTrue(varie.rimuoviTutto());
+		assertFalse(varie.isSaved());
+	}	
 	
 }
