@@ -51,7 +51,7 @@ public class Interfaccia {
 				}
 			}
 			case "4", "quit", "esci", "q" -> terminate();
-			default -> System.out.println(ANSI_YELLOW+"ATTEZIONE: la scelta effettuata non è valida."+ANSI_RESET);
+			default -> System.out.println(ANSI_YELLOW+"ATTENZIONE: la scelta effettuata non è valida."+ANSI_RESET);
 		}
 	}
 	
