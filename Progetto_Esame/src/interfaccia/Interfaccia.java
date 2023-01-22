@@ -78,7 +78,7 @@ public class Interfaccia {
 			}
 			case "i", "importa", "importare", "importa da file", "importa file", "import" -> {
 				try {
-					System.out.println(box.caricaAgendaDaFile(Input.readString("Inserire nome agenda da caricare: ")) ? 
+					System.out.println(box.caricaAgendaDaFile(Input.readString("Inserire nome del file da cui importare l'agenda: ")) ? 
 							ANSI_GREEN+"\n*** Agenda aggiunta con successo ***\n"+ANSI_RESET : ANSI_YELLOW+"\nATTENZIONE! Impossibile aggiungere l'agenda con il medesimo nome di un'altra!\n"+ANSI_RESET);
 					return;
 				}
