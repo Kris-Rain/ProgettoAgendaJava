@@ -168,7 +168,7 @@ class TestContenitoreAgende {
 	
 	@Test
 	void testElencaOrdineAlfabetico() {
-		assertEquals("Altro\nPersonale\nVarie\n", box.elencaNomiAgende());
+		assertEquals("- Altro*\n- Personale*\n- Varie*\n", box.elencaNomiAgende());
 	}
 	
 	
