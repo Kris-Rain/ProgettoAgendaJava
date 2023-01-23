@@ -20,9 +20,9 @@ import jbook.util.PatternMatcher;
  * La classe {@code Agenda} rappresenta una semplice classe per gestire
  * un insieme di appuntamenti.
  * <p>
- * Ogni {@code Agenda} è formata da:<br>
- * - un <strong>nome</strong> nel formato {@link String} che la identifica;<br>
- * - un {@code ArrayList<Appuntamento>}, ovvero una lista di oggetti {@link Appuntamento}.
+ * Ogni {@code Agenda} è formata da:<ul>
+ * <li> un <strong>nome</strong> nel formato {@link String} che la identifica;<br>
+ * <li> un {@code ArrayList<Appuntamento>}, ovvero una lista di oggetti {@link Appuntamento}.</ul>
  * <p>
  * Durante il suo ciclo di vita, ogni {@code Agenda} ordina automaticamente (in base alla data e all'orario di inizio)
  * gli appuntamenti al suo interno.
@@ -40,7 +40,7 @@ import jbook.util.PatternMatcher;
  * salvate su file di testo {@code txt}. Tale percorso, di base, è la cartella {@code Agende_testuali/}
  * presente nella directory di questo progetto. Se tale cartella non esiste può venire creata
  * tramite il metodo statico {@link #createPathToAgende} oppure direttamente durante un tentativo
- * di salvataggio su file. È anche possibile modificare tale percorso usando il metodo {@code Agenda.changePathToAgende()}
+ * di salvataggio su file. È anche possibile modificare tale percorso usando il metodo {@link #changePathToAgende}
  * durante l'esecuzione.
  * <p>
  * <strong>N.B. :</strong> le agende vengono salvate SOLO su file di tipo {@code txt}. È possibile importarle anche da file
@@ -228,7 +228,7 @@ public class Agenda implements Iterable<Appuntamento> {
 	
 	/**
 	 * Ritorna il Path per il salvataggio delle agende su file.
-	 * @return il nome del Path  nel formato {@code String}.
+	 * @return il nome del Path di tipo {@code String}.
 	 */
 	
 	public static String getFilesPath() {
@@ -258,11 +258,11 @@ public class Agenda implements Iterable<Appuntamento> {
 	}
 	
 	/**
-	 * Testa se una lista di appuntamenti potrebbe identificare un'agenda.
+	 * Verifica se una lista di appuntamenti potrebbe identificare un'agenda.
 	 * Ritorna {@code true} se ogni appuntamento è compatibile con gli altri.
 	 * 
 	 * @param appuntamenti {@code ArrayList} di appuntamenti da testare.
-	 * @return {@code true} la lista di appuntamenti può identificare un'agenda, {@code false} altrimenti.
+	 * @return {@code true} se la lista di appuntamenti può identificare un'agenda, {@code false} altrimenti.
 	 */
 	
 	public static boolean isAgenda(ArrayList<Appuntamento> appuntamenti) {
@@ -277,7 +277,7 @@ public class Agenda implements Iterable<Appuntamento> {
 	/**
 	 * Ritorna il nome dell'agenda.
 	 * 
-	 * @return il nome dell'agenda nel formato {@code String}.
+	 * @return il nome dell'agenda di tipo {@code String}.
 	 */
 
 	public String getNomeAgenda() {
@@ -289,7 +289,7 @@ public class Agenda implements Iterable<Appuntamento> {
 	 * imposta il nome dell'agenda al default <em>"Agenda"</em>.
 	 * <p>Imposta l'agenda come <em>non salvata</em>.
 	 * 
-	 * @param nomeAgenda nuovo nome dell'agenda nel formato {@code String}.
+	 * @param nomeAgenda nuovo nome dell'agenda di tipo {@code String}.
 	 */
 
 	public void setNomeAgenda(String nomeAgenda) {
@@ -446,7 +446,7 @@ public class Agenda implements Iterable<Appuntamento> {
 	 * stringa sarà vuota se nessun appuntamento è stato trovato.
 	 * 
 	 * @param nome il nome della persona da cui elencare gli appuntamenti
-	 * @return l'elenco degli appuntamenti trovati nel formato {@code String}
+	 * @return l'elenco degli appuntamenti trovati di tipo {@code String}.
 	 */
 	
 	public String elencaPerPersona(String nome) {
@@ -459,7 +459,7 @@ public class Agenda implements Iterable<Appuntamento> {
 	 * La stringa sarà vuota se nessun appuntamento è stato trovato.
 	 * 
 	 * @param data la data da cui elencare gli appuntamenti
-	 * @return l'elenco degli appuntamenti trovati nel formato {@code String}
+	 * @return l'elenco degli appuntamenti trovati di tipo {@code String}.
 	 */
 	
 	public String elencaPerData(String data) {
@@ -470,7 +470,7 @@ public class Agenda implements Iterable<Appuntamento> {
 	 * Ritorna una rappresentazione in stringa dell'agenda.<br>
 	 * La stringa descriverà solo il nome dell'agenda se quest'ultima è vuota.
 	 * 
-	 * @return una rappresentazione dell'agenda nel formato {@code String}
+	 * @return una rappresentazione dell'agenda di tipo {@code String}.
 	 */
 	
 	@Override
@@ -508,9 +508,9 @@ public class Agenda implements Iterable<Appuntamento> {
 	 * 
 	 * @param data la data dell'appuntamento da aggiungere nel formato {@code dd-MM-uuuu}.
 	 * @param orario l'orario dell'appuntamento da aggiungere nel formato {@code HH-mm}.
-	 * @param durata la durata dell'appuntamento da aggiungere nel formato {@code String}.
-	 * @param luogo il luogo nell'appuntamento da aggiungere nel formato {@code String}.
-	 * @param nomePersona il nome della persona con cui si ha l'appuntamento nel formato {@code String}.
+	 * @param durata la durata dell'appuntamento da aggiungere di tipo {@code String}.
+	 * @param luogo il luogo nell'appuntamento da aggiungere di tipo {@code String}.
+	 * @param nomePersona il nome della persona con cui si ha l'appuntamento di tipo {@code String}.
 	 * 
 	 * @return {@code true} se l'aggiunta ha avuto esito positivo, {@code false} altrimenti.
 	 */
@@ -539,9 +539,9 @@ public class Agenda implements Iterable<Appuntamento> {
 	 * {@link Appuntamento.ControlloDati#controlloPer(Appuntamento.ControlloDati.TipoControllo, String)}<br>
 	 * 
 	 * @param dataOrario la data e l'orario dell'appuntamento da aggiungere nel formato {@code dd-MM-uuuu HH-mm}.
-	 * @param durata la durata dell'appuntamento da aggiungere nel formato {@code String}.
-	 * @param luogo il luogo nell'appuntamento da aggiungere nel formato {@code String}.
-	 * @param nomePersona il nome della persona con cui si ha l'appuntamento nel formato {@code String}.
+	 * @param durata la durata dell'appuntamento da aggiungere di tipo {@code String}.
+	 * @param luogo il luogo nell'appuntamento da aggiungere di tipo {@code String}.
+	 * @param nomePersona il nome della persona con cui si ha l'appuntamento di tipo {@code String}.
 	 * 
 	 * @return {@code true} se l'aggiunta ha avuto esito positivo, {@code false} altrimenti.
 	 */
@@ -657,20 +657,20 @@ public class Agenda implements Iterable<Appuntamento> {
 	 * da modificare <em>(data, orario, durata, luogo, persona)</em> e il
 	 * nuovo valore da inserire.
 	 * <p>Se la modifica è andata a buon fine, imposta l'agenda come <em>non salvata</em>.
-	 * <p>Per far sì che la modifica vada a buon fine devono essere verificate le seguenti condizioni:<br>
-	 * - L'appuntamento deve esistere;<br>
-	 * - Il nome del parametro deve essere valido (il controllo è <em>case-insensitive</em> e ignora eventuali spazi
+	 * <p>Per far sì che la modifica vada a buon fine devono essere verificate le seguenti condizioni:<ul>
+	 * <li> L'appuntamento deve esistere;<br>
+	 * <li> Il nome del parametro deve essere valido (il controllo è <em>case-insensitive</em> e ignora eventuali spazi
 	 * all'inizio e alla fine);<br>
-	 * - La modifica non deve rendere l'appuntamento incompatibile con l'agenda;<br>
-	 * - Il nuovo valore deve avere il formato corretto a seconda del parametro che va a modificare.<br>
+	 * <li> La modifica non deve rendere l'appuntamento incompatibile con l'agenda;<br>
+	 * <li> Il nuovo valore deve avere il formato corretto a seconda del parametro che va a modificare.</ul>
 	 * <em><br>Per maggiori informazioni sui controlli dei parametri vedi anche:</em><br>
 	 * {@link Appuntamento.ControlloDati#controlloPer(Appuntamento.ControlloDati.TipoControllo, String)}<br>
 	 * 
 	 * 
 	 * @param dataApp data dell'appuntamento da modificare nel formato {@code dd-MM-uuuu}
 	 * @param orarioApp orario dell'appuntamento da modificare nel formato {@code HH-mm}
-	 * @param parametroDaModificare nome del parametro da modificare nel formato {@code String}
-	 * @param newValue nuovo valore da inserire nel formato {@code String}
+	 * @param parametroDaModificare nome del parametro da modificare di tipo {@code String}.
+	 * @param newValue nuovo valore da inserire di tipo {@code String}.
 	 * 
 	 * @return {@code 1} se la modifica è andata a buon file.<br>
 	 * {@code 0} se non è stato possibile trovare l'appuntamento da modificare.<br>
@@ -704,19 +704,19 @@ public class Agenda implements Iterable<Appuntamento> {
 	 * <p>Se la modifica è andata a buon fine, imposta l'agenda come <em>non salvata</em>.
 	 * <p><strong>N.B. : </strong> la data e l'orario devono essere separati da almeno uno spazio.<br>
 	 * Eventuali altri valori dopo l'orario (se separati da spazi) vengono ignorati.
-	 * <p>Per far sì che la modifica vada a buon fine devono essere verificate le seguenti condizioni:<br>
-	 * - L'appuntamento deve esistere;<br>
-	 * - Il nome del parametro deve essere valido (il controllo è <em>case-insensitive</em> e ignora eventuali spazi
+	 * <p>Per far sì che la modifica vada a buon fine devono essere verificate le seguenti condizioni:<ul>
+	 * <li> L'appuntamento deve esistere;<br>
+	 * <li> Il nome del parametro deve essere valido (il controllo è <em>case-insensitive</em> e ignora eventuali spazi
 	 * all'inizio e alla fine);<br>
-	 * - La modifica non deve rendere l'appuntamento incompatibile con l'agenda;<br>
-	 * - Il nuovo valore deve avere il formato corretto a seconda del parametro che va a modificare.<br>
+	 * <li> La modifica non deve rendere l'appuntamento incompatibile con l'agenda;<br>
+	 * <li> Il nuovo valore deve avere il formato corretto a seconda del parametro che va a modificare.</ul>
 	 * <em><br>vedi anche:</em><br>
 	 * {@link Appuntamento.ControlloDati#controlloPer(Appuntamento.ControlloDati.TipoControllo, String)}<br>
 	 * 
 	 * 
 	 * @param dataOrarioApp data e orario dell'appuntamento da modificare nel formato {@code dd-MM-uuuu HH-mm}
-	 * @param parametroDaModificare nome del parametro da modificare nel formato {@code String}
-	 * @param newValue nuovo valore da inserire nel formato {@code String}
+	 * @param parametroDaModificare nome del parametro da modificare di tipo {@code String}.
+	 * @param newValue nuovo valore da inserire di tipo {@code String}.
 	 * 
 	 * @return {@code 1} se la modifica è andata a buon file.<br>
 	 * {@code 0} se non è stato possibile trovare l'appuntamento da modificare.<br>
@@ -770,11 +770,11 @@ public class Agenda implements Iterable<Appuntamento> {
 	/**
 	 * Verifica che l'oggetto passato come parametro sia uguale
 	 * a quest'agenda.
-	 * <p>Più precisamente:<br>
-	 * - l'oggetto non deve essere {@code null};<br>
-	 * - la classe dell'oggetto deve essere {@code Agenda};<br>
-	 * - il nome dell'agenda deve essere il medesimo;<br>
-	 * - gli appuntamenti devono essere i medesimi.
+	 * <p>Più precisamente:<ul>
+	 * <li> l'oggetto non deve essere {@code null};
+	 * <li> la classe dell'oggetto deve essere {@code Agenda};
+	 * <li> il nome dell'agenda deve essere il medesimo;
+	 * <li> gli appuntamenti devono essere i medesimi.</ul>
 	 * 
 	 * <p>Ritorna {@code true} se queste condizioni sono soddisfatte.
 	 * 
