@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.function.BiPredicate;
+import java.util.function.UnaryOperator;
+
 import codice.*;
 import jbook.util.*;
 import codice.Appuntamento.ControlloDati;
@@ -43,7 +45,7 @@ public class Interfaccia {
 	
 	private static void menuAgende() {
 		System.out.println("Agende:\n"+box.elencaNomiAgende());
-		switch(Input.readString("1) Seleziona agenda\n2) Aggiungi agenda\n3) Rimuovi agenda\nq) Esci\nInserire un'opzione: ").toLowerCase()) {
+		switch(Input.readString("1) Seleziona agenda\n2) Aggiungi agenda\n3) Rimuovi agenda\nq) Esci\nInserire un'opzione: ").toLowerCase().strip()) {
 			case "1", "seleziona", "seleziona agenda" -> {
 				String selected=Input.readString("Digitare l'agenda desiderata (il controllo è case-sensitive e tiene conto degli spazi): ");
 				try {
@@ -82,17 +84,16 @@ public class Interfaccia {
 	}
 	
 	private static void aggiungiAgenda() {
+		String success = ANSI_GREEN+"\n*** Agenda aggiunta con successo ***\n"+ANSI_RESET, failure = ANSI_YELLOW+"\nATTENZIONE! Impossibile aggiungere l'agenda con il medesimo nome di un'altra!\n"+ANSI_RESET;
 		while(true) {
 			switch(Input.readString("Creare una nuova agenda (c) o importarla da file (i)? ").toLowerCase().strip()) {
 			case "c", "crea", "creare", "crea agenda", "crea nuova", "creare nuova", "crea nuova agenda", "creare nuova agenda" -> {
-				System.out.println(box.aggiungiAgenda(Input.readString("Inserire nome agenda: ")) ? 
-						ANSI_GREEN+"\n*** Agenda aggiunta con successo ***\n"+ANSI_RESET : ANSI_YELLOW+"\nATTENZIONE! Impossibile aggiungere l'agenda con il medesimo nome di un'altra!\n"+ANSI_RESET);
+				System.out.println(box.aggiungiAgenda(Input.readString("Inserire nome agenda: ")) ? success : failure);
 				return;
 			}
 			case "i", "importa", "importare", "importa da file", "importa file", "import" -> {
 				try {
-					System.out.println(box.caricaAgendaDaFile(Input.readString("Inserire nome del file da cui importare l'agenda: ")) ? 
-							ANSI_GREEN+"\n*** Agenda aggiunta con successo ***\n"+ANSI_RESET : ANSI_YELLOW+"\nATTENZIONE! Impossibile aggiungere l'agenda con il medesimo nome di un'altra!\n"+ANSI_RESET);
+					System.out.println(box.caricaAgendaDaFile(Input.readString("Inserire nome del file da cui importare l'agenda: ")) ? success : failure);
 					return;
 				}
 				catch(IOException e) {
@@ -143,6 +144,36 @@ public class Interfaccia {
         } else System.out.println(ANSI_YELLOW+"\nModifica non riuscita: il nome inserito è già esistente "+ANSI_RESET);
     }
     
+    
+    private static void elencaPer(RequestApp request, UnaryOperator<String> toList) {
+    	String result = toList.apply(Input.readString(request.REQUEST).strip());
+    	System.out.println( (result.isEmpty() ? request.ERR_MESSAGE : "\n" + result) );
+    }
+    
+    private static void elencaAppuntamenti(Agenda agenda) {
+    	
+    	while(true) {
+    		switch(Input.readString("Si desidera elencare per:\n1) Data\n2) Persona\n3) Tutto\nInserire un'opzione: ").strip().toLowerCase()) {
+	    		case "1", "data" -> { 
+	    			elencaPer(new RequestApp("Inserire la data degli appuntamenti da elencare: ", 
+	    					  ANSI_YELLOW+"\n*** Nessun Appuntamento trovato con questa data ***"+ANSI_RESET), data -> agenda.elencaPerData(data));
+	    			return;
+	    		}
+	    		case "2", "persona" -> {
+	    			elencaPer(new RequestApp("Inserire il nome della persona con cui effettuare la ricerca: ", 
+	    					  ANSI_YELLOW+"\n*** Nessun Appuntamento trovato con questa persona ***"+ANSI_RESET), persona -> agenda.elencaPerPersona(persona));
+	    			return;
+	    		}
+	    		case "3", "tutto" -> { 
+	    			String result = agenda.toString();
+	    			System.out.println( result.equals("Agenda: "+ agenda.getNomeAgenda() +"\n") ? ANSI_YELLOW+"\n*** Agenda Vuota ***"+ANSI_RESET : "\n"+result ); 
+	    			return; 
+	    		}
+	    		default -> System.out.println(ANSI_YELLOW+"Attenzione, la scelta effettuata non è valida."+ANSI_RESET);
+    		}
+    	}
+    }
+    
     private static String controlloDatoAppuntamento(TipoControllo tc, String request, String errMessage) {
     	String result;
     	boolean pass = false;
@@ -152,27 +183,6 @@ public class Interfaccia {
     		if(!pass) System.out.println(ANSI_YELLOW+errMessage+ANSI_RESET);
     	}	while(!pass);
     	return result;
-    }
-    
-    
-    private static void elencaAppuntamenti(Agenda agenda) {
-    	
-    	while(true) {
-    		switch(Input.readString("Si desidera elencare per:\n1) Data\n2) Persona\n3) Tutto\nInserire un'opzione: ").strip().toLowerCase()) {
-	    		case "1", "data" -> {
-	    			String data = Input.readString("Inserire la data degli appuntamenti da elencare: ").strip();
-	    			System.out.println( agenda.elencaPerData(data).isEmpty() ? ANSI_YELLOW+"\n*** Nessun Appuntamento trovato con questa data ***"+ANSI_RESET : "\n"+agenda.elencaPerData(data));
-	    			return;
-	    		}
-	    		case "2", "persona" -> {
-	    			String persona = Input.readString("Inserire il nome della persona con cui effettuare la ricerca: ").strip();
-	    			System.out.println( agenda.elencaPerPersona(persona).isEmpty() ? ANSI_YELLOW+"\n*** Nessun Appuntamento trovato con questa persona ***"+ANSI_RESET : "\n"+agenda.elencaPerPersona(persona));
-	    			return;
-	    		}
-	    		case "3", "tutto" -> { System.out.println( agenda.toString().isEmpty() ? ANSI_YELLOW+"\n*** Agenda Vuota ***"+ANSI_RESET : "\n"+agenda.toString() ); return; }
-	    		default -> System.out.println(ANSI_YELLOW+"Attenzione, la scelta effettuata non è valida."+ANSI_RESET);
-    		}
-    	}
     }
     
     private static void creaAppuntamento(Agenda agenda) {
