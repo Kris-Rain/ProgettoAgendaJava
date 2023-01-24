@@ -1,8 +1,3 @@
-/**
- * @author Kristian Rigo
- * @author Nicolò Bianchetto
- */
-
 package codice;
 
 import java.time.format.DateTimeFormatter;
@@ -13,12 +8,110 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import jbook.util.PatternMatcher;
 
+/**
+ * La classe {@code Appuntamento} descrive una serie di metodi per la gestione di un singolo appuntamento.
+ * <p>
+ * 
+ * Ogni {@code Appuntamento} è costituito da:<ul>
+ * <li> una <strong>data</strong> di tipo {@link String} che identifica il giorno dell'appuntamento, 
+ * espressa nel formato <strong>{@code dd-MM-uuuu}</strong>;
+ * 
+ * <li> un <strong>orario</strong> di tipo {@link String} espresso nel formato <strong>{@code HH-mm}</strong>;
+ * 
+ * <li> una <strong>durata</strong> di tipo {@link String} espressa in <strong>{@code minuti}</strong> ed un massimo di quattro cifre;
+ * 
+ * <li> un <strong>luogo</strong> di tipo {@link String} espresso in <strong>{@code caratteri alfanumerici}</strong> 
+ * ove il numero può essere inserito solo alla fine;
+ * 
+ * <li> un <strong>nome persona</strong> di tipo {@link String} espresso in <strong>{@code caratteri alfanumerici}</strong> 
+ * tuttavia non può essere espresso solo con caratteri numerici.
+ * </ul><p>
+ * 
+ * Durante la creazione di un {@code Appuntamento}, all'utente viene chiesto di inserire questi parametri indispensabili, 
+ * che verranno controllati attraverso dei test privati e pubblici per verificare la correttezza dei dati.<br>
+ * 
+ * In particolare:<ul>
+ * <li> la <strong>data</strong> deve rispettare il formato <strong>{@code dd-MM-uuuu}</strong>
+ * e nel caso l'utente inserisca una data non congrua con il calendario, verrà sollevata un'eccezione {@link AppuntamentoException}. E.g.:
+ * <blockquote><pre><em>"25-12-2023"</em>, <em><s>"30-15-1998"</em></s>, <em><s>"29-02-2023"</em></s>;</pre></blockquote>
+ * 
+ * <li> l'<strong>orario</strong> deve rispettare il formato <strong>{@code HH-mm}</strong>
+ * e nel caso l'utente inserisca un orario che superi le 24 ore, verrà sollevata un'eccezione {@link AppuntamentoException}. E.g.:
+ * <blockquote><pre><em>"23-30"</em>, <em>"00-00"</em>, <em><s>"27-30"</em></s>;</blockquote></pre>
+ * 
+ * <li> la <strong>durata</strong> deve essere espressa in <strong>{@code minuti}</strong>
+ * e deve rispettare la regex <em>^(0*[1-9][0-9]{0,3})$</em>, altrimenti verrà sollevata un'eccezione {@link AppuntamentoException}. E.g.:
+ * <blockquote><pre><em>"120"</em>, <em>"1000"</em>, <em><s>"0"</em></s>, <em><s>"10000"</em></s>;</blockquote></pre>
+ * 
+ * <li> il <strong>luogo</strong> deve essere espresso in <strong>{@code caratteri alfanumerici}</strong>
+ * e deve rispettare la regex <br><em>^[a-z]{1,20}(\\s)?[a-z]{0,20}(\\s[0-9]{0,4})?$</em>,
+ * altrimenti verrà sollevata un'eccezione {@link AppuntamentoException}. E.g.:
+ * <blockquote><pre><em>"Milano"</em>, <em>"Via Roma 46"</em>, <em><s>"36 Piazza Cavour"</em></s>;</blockquote></pre>
+ * 
+ * <li> il <strong>nome persona</strong> deve essere espresso in <strong>{@code caratteri alfanumerici}</strong>
+ * e deve rispettare la regex <br><em>^(?![0-9]+$)[a-z0-9]{1,20}(\\s)?[a-z0-9]{0,20}$</em>,
+ * altrimenti verrà sollevata un'eccezione {@link AppuntamentoException}. E.g.:
+ * <blockquote><pre><em>"Luca99"</em>, <em>"Marco Rossi"</em>, <em><s>"1998"</em></s>;</blockquote></pre></ul>
+ * 
+ * Inoltre all'interno del costruttore sono presenti <em>{@code dataTimeInizio}</em> e <em>{@code dataTimeFine}</em> di tipo {@link DataOrario},
+ * che equivalgono rispettivamente alla <strong>data</strong> e all'<strong>orario</strong> iniziale, impostato dall'utente e alla
+ * <strong>data</strong> e all'<strong>orario</strong> finale dopo l'aggiunta della durata all'orario.<br>
+ * Nel caso l'orario finale superi la mezzanotte, la data finale verrà aggiornata col giorno successivo. E.g.:
+ * <blockquote><pre>
+ * {@code String data = "31-12-1999";
+ * String orario = "23-30";
+ * String durata = 45;
+ * 
+ * DataOrario dataTimeInizio.toString() = "31-12-1999 23-30";
+ * DataOrario dataTimeFine.toString() = "01-01-2000 00-15";}</blockquote></pre>
+ * 
+ * {@code dataTimeInizio} e {@code dataTimeFine} sono utilizzati per controllare la <em>compatibilità</em> confrontando
+ * il nuovo appuntamento da aggiungere con questo {@code appuntamento} tramite i metodi:<ul>
+ * <li>{@link #isAfter(Appuntamento other)};
+ * <li>{@link #isBefore(Appuntamento other)};
+ * <li>{@link #isCompatible(Appuntamento other)};</ul>
+ * 
+ * Per recuperare i dati di un appuntamento nel tipo {@link String}, sono presenti dei metodi {@code getter}. In particolare:<ul>
+ * <li>{@link #getData()};
+ * <li>{@link #getOrario()};
+ * <li>{@link #getDurata()};
+ * <li>{@link #getLuogo()};
+ * <li>{@link #getPersona()};
+ * <li>{@link #getDataTimeInizio()};
+ * <li>{@link #getDataTimeFine()};</ul>
+ * 
+ * Sono presenti tre metodi di confronto a seconda del parametro:<ul>
+ * <li>{@link #matchData(String data)} -> confronta questa <strong>data</strong> con la data passata per argomento;
+ * <li>{@link #matchDataOrario(String data, String orario)} -> confronta questa <strong>data-orario</strong> con il data-orario passato per argomento;
+ * <li>{@link #matchPersona(String nome)} -> confronta questo <strong>nome persona</strong> con il nome persona passato per argomento.</ul>
+ * 
+ * Inoltre è possibile rappresentare l'appuntamento attraverso il metodo {@link #toString} e confrontare questo
+ * {@code Appuntamento} con un altro, tramite il metodo {@link #equals}.<p>
+ * 
+ * @see Agenda
+ * @see ContenitoreAgende
+ * @see AppuntamentoException
+ * @see DataOrario
+ * 
+ * @author Kristian Rigo
+ * @author Nicolò Bianchetto
+ */
+
 public class Appuntamento {
 	private DataOrario dataTimeInizio;
 	private DataOrario dataTimeFine;
 	private String durata;
 	private String luogo;
 	private String nomePersona;
+	
+	/**
+	 * Una classe interna che si occupa di gestire il controllo dei parametri
+	 * attraverso dei metodi privati e pubblici prima di essere utilizzati
+	 * per la creazione di un {@code Appuntamento}.<br>
+	 * In particolare, il metodo {@link #controlloPer} verifica se il parametro passato
+	 * come argomento è valido per la creazione di un {@code Appuntamento}, dato un {@link TipoControllo};<br>
+	 * Se i parametri superano questa fase di controllo, allora l'appuntamento verrà creato con questi dati.
+	 */
 	
 	public static class ControlloDati{
 		private static class ControlloMappato {
@@ -81,6 +174,18 @@ public class Appuntamento {
 			}
 		}
 		
+		/**
+		 * Una semplice enumarazione di tutti i tipi di controllo che
+		 * verranno utilizzati per validare i parametri, durante la creazione
+		 * di un nuovo {@code Appuntamento}.<p>
+		 * A seconda del tipo di controllo selezionato:<ul>
+		 * <li> {@code CONTROLLO_DATA} -> nel caso di validazione della data;
+		 * <li> {@code CONTROLLO_ORARIO} -> nel caso di validazione dell'orario;
+		 * <li> {@code CONTROLLO_DURATA} -> nel caso di validazione della durata;
+		 * <li> {@code CONTROLLO_LUOGO} -> nel caso di validazione del luogo;
+		 * <li> {@code CONTROLLO_NOME} -> nel caso di validazione del nome della persona;</ul>
+		 */
+		
 		public enum TipoControllo {
 			CONTROLLO_DATA,
 			CONTROLLO_ORARIO,
@@ -98,33 +203,6 @@ public class Appuntamento {
 			controlliMappati.put(TipoControllo.CONTROLLO_NOME, new ControlloMappato(TipoControllo.CONTROLLO_NOME));
 			return controlliMappati;
 		}
-
-		/**
-		 * 
-		 * @param data
-		 * @throws AppuntamentoException
-		 * 
-		 * Dopo la regex, faccio questo test per verificare che la data abbia senso.
-		 * 
-		 * DataTimeFormatter è un "Formatter" per stampa/parse (analisi) di DataTime
-		 * al metodo ofPattern() gli do il pattern, in questo caso dd-MM-uuuu (giorni-mesi-anni)
-		 * ResolverStyle è un enumerazione di valori. Mi indica i diversi stili di parsing
-		 * 
-		 * Ci sono Lenient, Smart e Strict
-		 * 
-		 * Lenient
-		 * accetto tutto
-		 * anche robe come 30 febbraio volendo
-		 * 
-		 * Smart
-		 * se la data è 30 febbraio la trasforma in 28 oppure 29 febbraio se bisestile
-		 * 
-		 * Strict (quello che uso)
-		 * non accetto proprio roba come
-		 * 31 Aprile
-		 * 30 Febbraio
-		 * 
-		 */
 		
 		private static boolean isDataTimeValid(String format, String dataTime){
 			try {
@@ -143,7 +221,23 @@ public class Appuntamento {
 		private static boolean isOrarioValido(String orario) {
 			return isDataTimeValid("HH-mm", orario);
 		}
-			
+		
+		/**
+		 * Dato un {@link TipoControllo}, verifica se la {@code stringa} passata 
+		 * come argomento è valida come parametro per la creazione di
+		 * un {@code Appuntamento} attraverso:<ul>
+		 * <li> {@link PatternMatcher} che confronta la stringa con la regex assegnata,
+		 * nel caso della <strong>durata</strong>, <strong>luogo</strong> e <strong>nome persona</strong>;
+		 * <li> {@link DataOrario} che utilizza la libreria {@link DateTimeFormatter} 
+		 * che nel caso della data, controlla se è conforme col formato <strong>{@code dd-MM-uuuu}</strong> 
+		 * e se è congrua con il calendario e nel caso dell'orario, se è conforme
+		 * col formato <strong>{@code HH-mm}</strong> e controlla se supera le 24 ore.</ul>
+		 * 
+		 * @param tc che descrive il tipo di controllo da effettuare sulla stringa.
+		 * @param stringa sulla quale verrà effettuato il controllo.
+		 * @return {@code true} se il {@code parametro} è valido, {@code false} altrimenti.
+		 */
+		
 		public static boolean controlloPer(TipoControllo tc, String stringa) {
 			HashMap<TipoControllo, ControlloMappato> controlliMappati = creaControlliMappati();
 			return controlliMappati.get(tc).test(stringa);
@@ -159,6 +253,26 @@ public class Appuntamento {
 		}
 	}
 	
+	/**
+	 * Crea un nuovo {@code Appuntamento} assegnando data, orario, durata, luogo e nome della persona:<ul>
+	 * <li> Verifica i parametri e lancia un eccezione {@link AppuntamentoException} 
+	 * se non sono validi;
+	 * <li> Crea un nuovo {@link DataOrario} passando la data e l'orario come argomenti 
+	 * e assegnandolo alla variabile {@code dataTimeInizio};
+	 * <li> Viene sommata la {@code durata} a {@code dataTimeInizio} e assegnandola
+	 * alla variabile {@code dataTimeFine};</ul>
+	 * Quando verrà aggiunto un nuovo {@code Appuntamento} nell'{@link Agenda},
+	 * {@code dataTimeInizio} e {@code dataTimeFine} verranno confrontati per 
+	 * verificare la compatibilità fra tutti gli appuntamenti tramite {@link #isCompatible}.
+	 * 
+	 * @param data
+	 * @param orario
+	 * @param durata
+	 * @param luogo
+	 * @param nomePersona
+	 * @throws AppuntamentoException se i parametri passati come argomento non superano i controlli.
+	 */
+	
 	public Appuntamento(String data, String orario, String durata, String luogo, String nomePersona) throws AppuntamentoException {
 		ControlloDati.testParametri(data, orario, durata, luogo, nomePersona);
 		this.dataTimeInizio = new DataOrario(data, orario);
@@ -167,86 +281,195 @@ public class Appuntamento {
 		this.luogo=luogo;
 		this.nomePersona=nomePersona;
 	}
-
+	
+	/**
+	 * Crea un nuovo {@code Appuntamento} attraverso gli elementi dell'array <strong>{@code parametri}</strong>.
+	 * 
+	 * @param parametri di tipo {@code String[]} che descrive l'insieme dei dati per la creazione di un {@code Appuntamento}.
+	 * @throws AppuntamentoException se i parametri passati come argomento non superano i controlli.
+	 */
+	
 	public Appuntamento(String[] parametri) throws AppuntamentoException {
 		this(parametri[0], parametri[1], parametri[2], parametri[3], parametri[4]);
 	}
 	
+	/**
+	 * Restituisce la data dell'appuntamento.
+	 * 
+	 * @return la data dell'appuntamento nel tipo {@link String}.
+	 */
+
 	public String getData() {
 		return dataTimeInizio.getDataToString();
 	}
+	
+	/**
+	 * Restituisce il nome della persona dell'appuntamento.
+	 * 
+	 * @return il nome della persona dell'appuntamento nel tipo {@link String}.
+	 */
+	
 	public String getPersona() {
 		return nomePersona;
 	}
+	
+	/**
+	 * Restituisce l'orario dell'appuntamento.
+	 * 
+	 * @return l'orario dell'appuntamento nel tipo {@link String}.
+	 */
+	
 	public String getOrario() {
 		return dataTimeInizio.getOrarioToString();
 	}
+	
+	/**
+	 * Restituisce la durata dell'appuntamento.
+	 * 
+	 * @return la durata dell'appuntamento nel tipo {@link String}.
+	 */
+	
 	public String getDurata() {
 		return durata;
 	}
+	
+	/**
+	 * Restituisce il luogo dell'appuntamento.
+	 * 
+	 * @return il luogo dell'appuntamento nel tipo {@link String}.
+	 */
+	
 	public String getLuogo() {
 		return luogo;
 	}
+	
+	/**
+	 * Restituisce il data-orario iniziale dell'appuntamento.
+	 * 
+	 * @return il data-orario iniziale dell'appuntamento nel tipo {@link DataOrario}.
+	 */
+	
 	public DataOrario getDataTimeFine() {
 		return dataTimeFine;
 	}
+	
+	/**
+	 * Restituisce il data-orario finale dell'appuntamento.
+	 * 
+	 * @return il data-orario finale dell'appuntamento nel tipo {@link DataOrario}.
+	 */
+	
 	public DataOrario getDataTimeInizio() {
 		return dataTimeInizio;
 	}
-	public void setData(String data) {
-		if(ControlloDati.controlloPer(ControlloDati.TipoControllo.CONTROLLO_DATA, data)) dataTimeInizio=new DataOrario(data, this.getOrario());
-	}
-	public void setOrario(String orario) {
-		if(ControlloDati.controlloPer(ControlloDati.TipoControllo.CONTROLLO_ORARIO, orario)) dataTimeInizio=new DataOrario(this.getData(), orario);
-	}
-	public void setDurata(String durata) {
-		this.durata = durata;
-	}
-	public void setLuogo(String luogo) {
-		this.luogo = luogo;
-	}
-	public void setNomePersona(String nomePersona) {
-		this.nomePersona = nomePersona;
-	}
+	
+	/**
+	 * Crea un {@link PatternMatcher} confrontando il nome persona di quest'appuntamento
+	 * con la stringa {@code nome} passata come argomento, utilizzando la flag {@code CASE_INSENSITIVE}
+	 * in modo tale che le stringhe vengano confrontate non considerando le maiuscole.<br>
+	 * 
+	 * @param nome che identifica il nome della persona che si vuole confrontare.
+	 * @return {@code true} se sono uguali, {@code false} altrimenti.
+	 */
 
 	public boolean matchPersona(String nome) {
 		return PatternMatcher.create(this.nomePersona, nome, Pattern.CASE_INSENSITIVE).matches();
-
 	}
+	
+	/**
+	 * Crea un {@link PatternMatcher} confrontando la data di quest'appuntamento
+	 * con la stringa {@code data} passata come argomento.<br>
+	 * 
+	 * @param data che identifica la data che si vuole confrontare.
+	 * @return {@code true} se sono uguali, {@code false} altrimenti.
+	 */
+	
 	public boolean matchData(String data) {
 		return PatternMatcher.create(this.getData(), data).matches();
 	}
+	
+	/**
+	 * Crea un {@link PatternMatcher} confrontando il {@code dataTimeInizio} di quest'appuntamento
+	 * con le stringhe {@code data} e {@code orario} passate come argomento.<br>
+	 * 
+	 * @param data che identifica la data che si vuole confrontare.
+	 * @param orario che identifica l'orario che si vuole confrontare.
+	 * @return {@code true} se sono uguali, {@code false} altrimenti.
+	 */
 	
 	public boolean matchDataOrario(String data, String orario) {
 		return PatternMatcher.create(this.getDataTimeInizio().toString(), data + " " + orario).matches();
 	}
 	
+	/**
+	 * Controlla se questo {@code Appuntamento} inizia dopo la fine dell'appuntamento 
+	 * passato come argomento, per controllare la compatibilità prima di essere aggiunto
+	 * nell'{@link Agenda}.<br>
+	 * 
+	 * @param other appuntamento da aggiungere che deve terminare prima di questo {@code Appuntamento}.
+	 * @return {@code true} se questo {@code Appuntamento} inizia dopo other, {@code false} altrimenti.
+	 */
+	
 	public boolean isAfter(Appuntamento other) {
 		//Se inizio dopo che l'altro finisca, ritorno true
 		return (this.dataTimeInizio.compareTo(other.getDataTimeFine()) >= 0);
 	}
+	
+	/**
+	 * Controlla se questo {@code Appuntamento} termina prima dell'inizio dell'appuntamento 
+	 * passato come argomento, per controllare la compatibilità prima di essere aggiunto
+	 * nell'{@link Agenda}.<br>
+	 * 
+	 * @param other appuntamento da aggiungere che deve iniziare dopo la fine di questo {@code Appuntamento}.
+	 * @return {@code true} se questo {@code Appuntamento} termina prima di other, {@code false} altrimenti.
+	 */
+	
 	public boolean isBefore(Appuntamento other) {
 		//Se finisco prima che l'altro inizi, ritorno true
 		return (this.dataTimeFine.compareTo(other.getDataTimeInizio()) <= 0);
 	}
-	//metto this almeno si capisce di più a cosa mi riferisco
+	
+	/**
+	 * Controlla se questo {@code Appuntamento} termina prima o inizia dopo l'appuntamento 
+	 * passato come argomento, per controllare la compatibilità prima di essere aggiunto
+	 * nell'{@link Agenda}.<br>
+	 * 
+	 * @param other appuntamento da aggiungere che deve iniziare dopo la fine di questo {@code Appuntamento}
+	 * o terminare prima di questo {@code Appuntamento}.
+	 * @return {@code true} se questo {@code Appuntamento} termina prima o inizia dopo other, {@code false} altrimenti.
+	 */
+	
 	public boolean isCompatible(Appuntamento other) {
 		return this.isAfter(other) || this.isBefore(other);
 	}
 	
-	public boolean isDataTimeAfter(DataOrario other) {
-		return (this.dataTimeInizio.compareTo(other.plusMinuti(this.durata)) >= 0);
-	}
-	public boolean isDataTimeBefore(DataOrario other) {
-		return (this.dataTimeFine.compareTo(other) <= 0);
-	}
-	public boolean isDataTimeCompatible(DataOrario other) {
-		return this.isDataTimeAfter(other) || this.isDataTimeBefore(other);
-	}
+	/**
+	 * Restituisce una rappresentazione in stringa dell'appuntamento.
+	 * 
+	 * @return una rappresentazione dell'appuntamento nel formato {@code String}.
+	 */
+
 	@Override
 	public String toString() {
-		return this.getData()+" "+this.getOrario()+" "+this.getDurata()+" "+this.getLuogo()+" "+this.getPersona()+"\n";
+		return this.getData()+"|"+this.getOrario()+"|"+this.getDurata()+"min|"+this.getLuogo()+"|"+this.getPersona()+"\n";
 	}
+	
+	/**
+	 * Verifica che l'oggetto passato come parametro sia uguale
+	 * a questo appuntamento.
+	 * <p>Più precisamente:<ul>
+	 * <li> l'oggetto non deve essere {@code null};
+	 * <li> la classe dell'oggetto deve essere {@code Appuntamento};
+	 * <li> il {@code dataTimeInizio} dell'appuntamento deve essere il medesimo;
+	 * <li> il {@code dataTimeFine} dell'appuntamento deve essere il medesimo;
+	 * <li> la {@code durata} dell'appuntamento deve essere il medesimo;
+	 * <li> il {@code luogo} dell'appuntamento deve essere il medesimo;
+	 * <li> il {@code nome persona} dell'appuntamento deve essere il medesimo;</ul>
+	 * <p>Restituisce {@code true} se queste condizioni sono soddisfatte.
+	 * 
+	 * @param object il riferimento all'oggetto da comparare.
+	 * @return {@code true} se l'oggetto è uguale a questo appuntamento, {@code false} altrimenti.
+	 */
 	
 	@Override
 	public boolean equals(Object object) {
