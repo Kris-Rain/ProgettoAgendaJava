@@ -31,24 +31,24 @@ import jbook.util.PatternMatcher;
  * che verranno controllati attraverso dei test privati e pubblici per verificare la correttezza dei dati.<br>
  * 
  * In particolare:<ul>
- * <li> la <strong>data</strong> deve rispettare il formato <strong>{@code dd-MM-uuuu}</strong>
+ * <li>la <strong>data</strong> deve rispettare il formato <strong>{@code dd-MM-uuuu}</strong>
  * e nel caso l'utente inserisca una data non congrua con il calendario, verrà sollevata un'eccezione {@link AppuntamentoException}. E.g.:
  * <blockquote><pre><em>"25-12-2023"</em>, <em><s>"30-15-1998"</em></s>, <em><s>"29-02-2023"</em></s>;</pre></blockquote>
  * 
- * <li> l'<strong>orario</strong> deve rispettare il formato <strong>{@code HH-mm}</strong>
+ * <li>l'<strong>orario</strong> deve rispettare il formato <strong>{@code HH-mm}</strong>
  * e nel caso l'utente inserisca un orario che superi le 24 ore, verrà sollevata un'eccezione {@link AppuntamentoException}. E.g.:
  * <blockquote><pre><em>"23-30"</em>, <em>"00-00"</em>, <em><s>"27-30"</em></s>;</blockquote></pre>
  * 
- * <li> la <strong>durata</strong> deve essere espressa in <strong>{@code minuti}</strong>
+ * <li>la <strong>durata</strong> deve essere espressa in <strong>{@code minuti}</strong>
  * e deve rispettare la regex <em>^(0*[1-9][0-9]{0,3})$</em>, altrimenti verrà sollevata un'eccezione {@link AppuntamentoException}. E.g.:
  * <blockquote><pre><em>"120"</em>, <em>"1000"</em>, <em><s>"0"</em></s>, <em><s>"10000"</em></s>;</blockquote></pre>
  * 
- * <li> il <strong>luogo</strong> deve essere espresso in <strong>{@code caratteri alfanumerici}</strong>
+ * <li>il <strong>luogo</strong> deve essere espresso in <strong>{@code caratteri alfanumerici}</strong>
  * e deve rispettare la regex <br><em>^[a-z]{1,20}(\\s)?[a-z]{0,20}(\\s[0-9]{0,4})?$</em>,
  * altrimenti verrà sollevata un'eccezione {@link AppuntamentoException}. E.g.:
  * <blockquote><pre><em>"Milano"</em>, <em>"Via Roma 46"</em>, <em><s>"36 Piazza Cavour"</em></s>;</blockquote></pre>
  * 
- * <li> il <strong>nome persona</strong> deve essere espresso in <strong>{@code caratteri alfanumerici}</strong>
+ * <li>il <strong>nome persona</strong> deve essere espresso in <strong>{@code caratteri alfanumerici}</strong>
  * e deve rispettare la regex <br><em>^(?![0-9]+$)[a-z0-9]{1,20}(\\s)?[a-z0-9]{0,20}$</em>,
  * altrimenti verrà sollevata un'eccezione {@link AppuntamentoException}. E.g.:
  * <blockquote><pre><em>"Luca99"</em>, <em>"Marco Rossi"</em>, <em><s>"1998"</em></s>;</blockquote></pre></ul>
@@ -158,18 +158,60 @@ public class Appuntamento {
 		 * verranno utilizzati per validare i parametri, durante la creazione
 		 * di un nuovo {@code Appuntamento}.<p>
 		 * A seconda del tipo di controllo selezionato:<ul>
-		 * <li> {@code CONTROLLO_DATA} -> nel caso di validazione della data;
-		 * <li> {@code CONTROLLO_ORARIO} -> nel caso di validazione dell'orario;
-		 * <li> {@code CONTROLLO_DURATA} -> nel caso di validazione della durata;
-		 * <li> {@code CONTROLLO_LUOGO} -> nel caso di validazione del luogo;
-		 * <li> {@code CONTROLLO_NOME} -> nel caso di validazione del nome della persona;</ul>
+		 * <li> {@link #CONTROLLO_DATA} -> nel caso di validazione della data;
+		 * <li> {@link #CONTROLLO_ORARIO} -> nel caso di validazione dell'orario;
+		 * <li> {@link #CONTROLLO_DURATA} -> nel caso di validazione della durata;
+		 * <li> {@link #CONTROLLO_LUOGO} -> nel caso di validazione del luogo;
+		 * <li> {@link #CONTROLLO_NOME} -> nel caso di validazione del nome della persona;</ul>
 		 */
 		
 		public enum TipoControllo {
+			/**
+			 * Indica che si vuole verificare il parametro come se fosse la <strong>data</strong>. In particolare:<ul>
+			 * <li>la <strong>data</strong> deve rispettare il formato <strong>{@code dd-MM-uuuu}</strong>;
+			 * <li>nel caso l'utente inserisca una data non congrua con il calendario, verrà sollevata un'eccezione {@link AppuntamentoException}. E.g.:
+			 * <blockquote><pre>
+			 * Accettati: <em>"25-12-2023"</em>, <em>"29-02-2020"</em>;
+			 * Non accettati: <em>"30-15-1998"</em>, <em>"29-02-2023"</em>, <em>"03/11/2023"</em>;</pre></blockquote>
+			 */
 			CONTROLLO_DATA,
+			/**
+			 * Indica che si vuole verificare il parametro come se fosse l'<strong>orario</strong>. In particolare:<ul>
+			 * <li>deve rispettare il formato <strong>{@code HH-mm}</strong>;
+			 * <li>nel caso l'utente inserisca un orario che superi le 24 ore, verrà sollevata un'eccezione {@link AppuntamentoException}. E.g.:
+			 * <blockquote><pre>
+			 * Accettati: <em>"23-30"</em>, <em>"00-00"</em>;
+			 * Non accettati: <em>"27-30"</em>, <em>"24-30"</em>, <em>"00:30"</em>;</blockquote></pre>
+			 */
 			CONTROLLO_ORARIO,
+			/**
+			 * Indica che si vuole verificare il parametro come se fosse la <strong>durata</strong>. In particolare:<ul>
+			 * <li>deve essere espressa in <strong>{@code minuti}</strong>;
+			 * <li>deve rispettare la regex <em>^(0*[1-9][0-9]{0,3})$</em>, altrimenti verrà sollevata un'eccezione {@link AppuntamentoException}. E.g.:
+			 * <blockquote><pre>
+			 * Accettati: <em>"120"</em>, <em>"1000"</em>;
+			 * Non accettati: <em>"0"</em>, <em>"10000"</em>;</blockquote></pre>
+			 */
 			CONTROLLO_DURATA,
+			/**
+			 * Indica che si vuole verificare il parametro come se fosse il <strong>luogo</strong>. In particolare:<ul>
+			 * <li>deve essere espresso in <strong>{@code caratteri alfanumerici}</strong>
+			 * <li>deve rispettare la regex <em>^[a-z]{1,20}(\\s)?[a-z]{0,20}(\\s[0-9]{0,4})?$</em>,
+			 * altrimenti verrà sollevata un'eccezione {@link AppuntamentoException}. E.g.:
+			 * <blockquote><pre>
+			 * Accettati: <em>"Milano"</em>, <em>"Via Roma 46"</em>;
+			 * Non accettati: <em>"36 Piazza Cavour"</em>, <em>"!($(%"</em>, <em>"Novara123"</em></blockquote></pre>
+			 */
 			CONTROLLO_LUOGO,
+			/**
+			 * Indica che si vuole verificare il parametro come se fosse il <strong>luogo</strong>. In particolare:<ul>
+			 * <li>deve essere espresso in <strong>{@code caratteri alfanumerici}</strong>
+			 * <li>deve rispettare la regex <em>^(?![0-9]+$)[a-z0-9]{1,20}(\\s)?[a-z0-9]{0,20}$</em>,
+			 * altrimenti verrà sollevata un'eccezione {@link AppuntamentoException}. E.g.:
+			 * <blockquote><pre>
+			 * Accettati: <em>"Luca99"</em>, <em>"Marco Rossi"</em>;
+			 * Non accettati: <em>"1998"</em>, <em>"$(!$)!"</em>, <em>"1234"</em>;</blockquote></pre></ul>
+			 */
 			CONTROLLO_NOME
 		}
 		
