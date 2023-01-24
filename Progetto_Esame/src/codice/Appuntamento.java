@@ -141,27 +141,6 @@ public class Appuntamento {
 						exception = new AppuntamentoException("Nome non valido!");
 					}
 					
-					/* Ho fatto una modifichina alle regex. Ho aggiunto a inizio e fine stringa i simboli ^ e $ a tutti
-					 * ^ non indica solo "esclusione" ma anche inizio stringa, quando è messa fuori dalle quadrate
-					 * [^a-z] -> esclusione / ^[a-z] -> l'inizio deve essere una lettera a-z
-					 * $ indice fine stringa.
-					 * Dovrebbe renderle "più precise" ho letto... perché indichi proprio la stringa intera e non solo un suo contenuto
-					 * 
-					 * A fine CONTROLLO_LUOGO ho messo (\\s[0-9]{0,4}).. così facendo il luogo può anche essere volendo un indirizzo come Via Roma 36
-					 * Ho messo lo spazio obbligatorio in questo caso... boh in realtà solo perché Via Roma36 è bruttino.
-					 * 
-					 * Ah e poi ho aggiunto a CONTROLLO_NOME all'inizio (?![0-9]+$)
-					 * Perché volevo far sì che il nome potesse contenere numeri, però NON solo numeri.
-					 * Spiegato in breve:
-					 * ?! indica "Negative Lookahead" ... poi esistono anche Positive Lookahead (?=), Positive Lookbehind (?<=), Negative Lookbehind (?<!)
-					 * Lookhead vuol dire "che segue", Lookbehind vuol dire "che precede".
-					 * Positive vuol dire che accetto quello che segue/precede, Negative vuol dire che non lo accetto.
-					 * 
-					 * Quindi...
-					 * ^(?![0-9]+$) vuol dire
-					 * "L'inizio della stringa (^) NON deve essere seguito da [0-9] ripetuti da 1 a infinite volte (+) fino alla fine della stringa ($)"
-					 * In parole più semplici, quindi, una stringa non può essere formata solo da cifre ripetute.
-					 */
 				}
 			}
 			
