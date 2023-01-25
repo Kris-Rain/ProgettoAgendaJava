@@ -228,6 +228,9 @@ public class Agenda implements Iterable<Appuntamento> {
 	
 	/**
 	 * Ritorna il Path per il salvataggio delle agende su file.
+	 * Se questo non è stato cambiato, di base è la cartella <em>"Agende_testuali/"</em>
+	 * presente nel percorso di questo progetto.
+	 * 
 	 * @return il nome del Path di tipo {@code String}.
 	 */
 	
@@ -744,6 +747,7 @@ public class Agenda implements Iterable<Appuntamento> {
 	/**
 	 * Ritorna un nuovo IteratoreAgenda per iterare su ogni
 	 * oggetto {@code Appuntamento}.
+	 * <p>{@code IteratoreAgenda} implementa l'interfaccia {@link Iterator}.
 	 * 
 	 * @return un {@code IteratoreAgenda} di quest'agenda.
 	 */
