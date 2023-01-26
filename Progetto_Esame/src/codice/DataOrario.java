@@ -32,6 +32,8 @@ import java.time.format.ResolverStyle;
  * <li>la <strong>data</strong> è rappresentata nel formato <strong>{@code dd-MM-uuuu}</strong> con uno stile ti dipo {@code STRICT};
  * <li>l'<strong>orario</strong> è rappresentato nel formato <strong>{@code HH-mm}</strong> con uno stile ti dipo {@code STRICT}.</ul>
  * 
+ * @see Appuntamento
+ * 
  * @author Kristian Rigo
  * @author Nicolò Bianchetto
  */
@@ -55,8 +57,8 @@ public class DataOrario {
 	 * il modo in cui sono convertiti, attraverso un <strong>pattern</strong> ed uno <strong>stile</strong>.<br>
 	 * Lancia un eccezione {@link DateTimeParseException} se il parse non va a buon fine.
 	 * 
-	 * @param data
-	 * @param orario
+	 * @param data stringa che identifica la data
+	 * @param orario stringa che identifica l'orario
 	 * @throws DateTimeParseException se non è stato possibile parsificare i parametri
 	 */
 	
@@ -124,9 +126,9 @@ public class DataOrario {
 	 * String durata = 45;
 	 * 
 	 * DataOrario dataTimeInizio -> "31-12-1999 23-30";
-	 * DataOrario dataTimeFine = dataTimeInizio.plusMinuti(45) -> "01-01-2000 00-15";}</blockquote></pre>
+	 * DataOrario dataTimeFine = dataTimeInizio.plusMinuti(45) -> "01-01-2000 00-15";}</pre></blockquote>
 	 * 
-	 * @param durata
+	 * @param durata stringa che identifica la durata
 	 * @return un nuovo {@code DataOrario} con la data e l'orario aggiornati
 	 */
 	
@@ -159,8 +161,8 @@ public class DataOrario {
 	 * <li>Positivo se questo {@code DataOrario} è più grande di {@code Other};
 	 * <li>Negativo se questo {@code DataOrario} è più piccolo di {@code Other}.</ul>
 	 * 
-	 * @param data
-	 * @param orario
+	 * @param data stringa che identifica la data
+	 * @param orario stringa che identifica l'orario
 	 * @return un valore di tipo {@code int} negativo se più piccolo o positivo se più grande.
 	 */
 	
