@@ -10,6 +10,8 @@ package codice;
  * l'eccezione {@code AppuntamentoException} che potrà essere gestita tramite una {@code catch}
  * utilizzando il costruttore {@link #AppuntamentoException} e passando un messaggio come argomento.
  * 
+ * @see Appuntamento
+ * 
  * @author Kristian Rigo
  * @author Nicolò Bianchetto
  */
