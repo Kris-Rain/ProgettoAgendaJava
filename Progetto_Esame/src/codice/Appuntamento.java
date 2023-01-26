@@ -105,7 +105,7 @@ public class Appuntamento {
 	private String nomePersona;
 	
 	/**
-	 * Una classe interna che si occupa di gestire il controllo dei parametri
+	 * Una classe membro statica che si occupa di gestire il controllo dei parametri
 	 * attraverso dei metodi privati e pubblici prima di essere utilizzati
 	 * per la creazione di un {@code Appuntamento}.<br>
 	 * In particolare, il metodo {@link #controlloPer} verifica se il parametro passato
