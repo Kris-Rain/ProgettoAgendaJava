@@ -260,8 +260,7 @@ public class Appuntamento {
 		 */
 		
 		public static boolean controlloPer(TipoControllo tc, String stringa) {
-			HashMap<TipoControllo, ControlloMappato> controlliMappati = creaControlliMappati();
-			return controlliMappati.get(tc).test(stringa);
+			return new ControlloMappato(tc).test(stringa);
 		}
 		
 		private static void testParametri(String data, String orario, String durata, String luogo, String nome) throws AppuntamentoException {
