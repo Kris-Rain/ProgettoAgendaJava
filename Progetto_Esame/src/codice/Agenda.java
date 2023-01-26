@@ -13,7 +13,6 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
 import jbook.util.PatternMatcher;
 
 /**
@@ -60,7 +59,6 @@ import jbook.util.PatternMatcher;
  * <p>
  * Sono presenti ulteriori metodi, come {@link #isAgenda}, {@link #contains} e {@link #isCompatible}, 
  * utili a lavorare con oggetti di classe {@code Appuntamento}.
- * <p>
  * 
  * @see Appuntamento
  * @see ContenitoreAgende
@@ -506,7 +504,7 @@ public class Agenda implements Iterable<Appuntamento> {
 	 * Se l'aggiunta va a buon fine, l'agenda viene impostata a <em>non salvata</em> e ritorna {@code true}, 
 	 * altrimenti ritorna {@code false}. 
 	 * 
-	 * <em><p>Per maggiori informazioni sui controlli dei parametri vedi anche:</em><br>
+	 * <p><em>Per maggiori informazioni sui controlli dei parametri vedi anche:</em><br>
 	 * {@link Appuntamento.ControlloDati#controlloPer(Appuntamento.ControlloDati.TipoControllo, String)}<br>
 	 * 
 	 * @param data la data dell'appuntamento da aggiungere nel formato {@code dd-MM-uuuu}.
@@ -538,7 +536,7 @@ public class Agenda implements Iterable<Appuntamento> {
 	 * La data e l'orario sono identificati da un'unica stringa, per cui devono essere separati da almeno
 	 * uno spazio. Eventuali altri valori (se separati da spazi) vengono ignorati.
 	 * 
-	 * <em><p>Per maggiori informazioni sui controlli dei parametri vedi anche:</em><br>
+	 * <p><em>Per maggiori informazioni sui controlli dei parametri vedi anche:</em><br>
 	 * {@link Appuntamento.ControlloDati#controlloPer(Appuntamento.ControlloDati.TipoControllo, String)}<br>
 	 * 
 	 * @param dataOrario la data e l'orario dell'appuntamento da aggiungere nel formato {@code dd-MM-uuuu HH-mm}.
