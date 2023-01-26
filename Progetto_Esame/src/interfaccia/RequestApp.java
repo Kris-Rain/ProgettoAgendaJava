@@ -11,6 +11,8 @@ package interfaccia;
  * <em>e.g. attraverso un {@link java.util.HashMap} in cui ad ogni chiave è associata una {@code RequestApp}.</em>
  * <p><strong>Questa classe è immutabile. Una volta creata, le stringhe sono di sola lettura</strong>.
  * 
+ * @see Interfaccia
+ * 
  * @author Nicolò Bianchetto
  * @author Kristian Rigo
  */
