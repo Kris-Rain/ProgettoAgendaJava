@@ -8,7 +8,7 @@ package interfaccia;
  * <li> {@link #ERR_MESSAGE}, stringa che punta a descrivere l'eventuale errore associato alla richiesta.</ul>
  * <p>Nonostante l'utilizzo limitato, potrebbe essere utile, ad esempio, nei casi di richieste multiple.<br>
  * In particolare, potrebbe essere utile a compattare il codice evitando molte ripetizioni 
- * <em>e.g. attraverso un {@link HashMap} in cui ad ogni chiave è associata una {@code RequestApp}.</em>
+ * <em>e.g. attraverso un {@link java.util.HashMap} in cui ad ogni chiave è associata una {@code RequestApp}.</em>
  * <p><strong>Questa classe è immutabile. Una volta creata, le stringhe sono di sola lettura</strong>.
  * 
  * @author Nicolò Bianchetto
