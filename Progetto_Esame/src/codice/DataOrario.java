@@ -6,9 +6,10 @@ import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 
 /**
- * La classe {@code DataOrario} è una classe semplice che utilizza la libreria {@link DateTimeFormatter}, 
- * per agevolare le operazioni sulla data-orario di un {@link Appuntamento} e permette di lavorare
- * a partire da delle stringhe con una data ed un orario ed eseguire semplici operazioni.<br>
+ * La classe {@code DataOrario} è una classe semplice che permette di creare oggetti di tipo {@link LocalTime} e {@link LocalDate}, 
+ * parsificando le stringhe <strong>data</strong> e <strong>orario</strong> nel formato <strong>{@code dd-MM-uuuu}</strong> 
+ * e nel formato <strong>{@code HH-mm}</strong> rispettivamente.<br>Questo avviene sfruttando la classe DateTimeFormatter di Java. 
+ * Inoltre ciò agevola le operazioni su questi campi.<br>
  * 
  * In particolare:<ul>
  * <li>Permette di comparare due {@code DataOrario} tramite il metodo {@link #compareTo};
