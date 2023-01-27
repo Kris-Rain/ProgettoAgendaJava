@@ -1,9 +1,3 @@
-
-/**
- * @author Kristian Rigo
- * @author Nicolò Bianchetto
- */
-
 package test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -12,6 +6,11 @@ import codice.Appuntamento;
 import codice.Appuntamento.ControlloDati;
 import codice.Appuntamento.ControlloDati.TipoControllo;
 import codice.AppuntamentoException;
+
+/**
+ * @author Nicolò Bianchetto (matr. 20026606)
+ * @author Kristian Rigo (matr. 20046665)
+ */
 
 class TestAppuntamento {
 
@@ -198,6 +197,6 @@ class TestAppuntamento {
 	@Test
 	void testToString() throws AppuntamentoException {
 		Appuntamento a1 = new Appuntamento("10-12-2021", "23-30", "30", "Milano", "Luca");
-		assertEquals("10-12-2021 23-30 30 Milano Luca\n", a1.toString());
+		assertEquals("10-12-2021|23-30|30min|Milano|Luca\n", a1.toString());
 	}
 }
