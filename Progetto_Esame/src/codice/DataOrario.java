@@ -35,8 +35,8 @@ import java.time.format.ResolverStyle;
  * 
  * @see Appuntamento
  * 
- * @author Kristian Rigo
- * @author Nicolò Bianchetto
+ * @author Kristian Rigo (matr. 20046665)
+ * @author Nicolò Bianchetto (matr. 20026606)
  */
 
 public class DataOrario {
