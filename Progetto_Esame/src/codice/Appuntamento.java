@@ -92,8 +92,8 @@ import jbook.util.PatternMatcher;
  * @see AppuntamentoException
  * @see DataOrario
  * 
- * @author Kristian Rigo
- * @author Nicolò Bianchetto
+ * @author Kristian Rigo (matr. 20046665)
+ * @author Nicolò Bianchetto (matr. 20026606)
  */
 
 public class Appuntamento {
@@ -108,7 +108,7 @@ public class Appuntamento {
 	 * attraverso dei metodi privati e pubblici prima di essere utilizzati
 	 * per la creazione di un {@code Appuntamento}.<br>
 	 * In particolare, il metodo {@link #controlloPer} verifica se il parametro passato
-	 * come argomento è valido per la creazione di un {@code Appuntamento}, dato un {@link TipoControllo}.<br>
+	 * come argomento è valido per la creazione di un {@code Appuntamento}, dato un {@link TipoControllo};<br>
 	 * Se i parametri superano questa fase di controllo, allora l'appuntamento verrà creato con questi dati.
 	 */
 	
@@ -213,7 +213,6 @@ public class Appuntamento {
 			 */
 			CONTROLLO_NOME
 		}
-
 		
 		private static boolean isDataTimeValid(String format, String dataTime){
 			try {
