@@ -14,6 +14,11 @@ import codice.Appuntamento;
 import codice.AppuntamentoException;
 import codice.ContenitoreAgende;
 
+/**
+ * @author Nicolò Bianchetto (matr. 20026606)
+ * @author Kristian Rigo (matr. 20046665)
+ */
+
 class TestContenitoreAgende {
 	
 	private ContenitoreAgende box;
@@ -216,7 +221,4 @@ class TestContenitoreAgende {
 		});
 
 	}
-	
-	
-
 }
