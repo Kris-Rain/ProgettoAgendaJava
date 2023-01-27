@@ -48,8 +48,8 @@ import jbook.util.PatternMatcher;
  * @see Appuntamento
  * 
  * 
- * @author Nicolò Bianchetto
- * @author Kristian Rigo
+ * @author Nicolò Bianchetto (matr. 20026606)
+ * @author Kristian Rigo (matr. 20046665)
  */
 
 
