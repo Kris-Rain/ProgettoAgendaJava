@@ -13,8 +13,8 @@ import java.util.regex.Pattern;
  *<p><strong>Questa classe è immutabile</strong>.
  * 
  * 
- * @author Nicolò Bianchetto
- * @author Kristian Rigo
+ * @author Nicolò Bianchetto (matr. 20026606)
+ * @author Kristian Rigo (matr. 20046665)
  */
 
 public class PatternMatcher {
