@@ -1,14 +1,17 @@
 package test;
 
 import static org.junit.jupiter.api.Assertions.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
-
 import org.junit.jupiter.api.Test;
 import codice.*;
+
+/**
+ * @author Nicolò Bianchetto (matr. 20026606)
+ * @author Kristian Rigo (matr. 20046665)
+ */
 
 class TestAgenda {
 
