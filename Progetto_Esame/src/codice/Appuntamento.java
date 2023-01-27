@@ -3,7 +3,6 @@ package codice;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
-import java.util.HashMap;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import jbook.util.PatternMatcher;
@@ -109,7 +108,7 @@ public class Appuntamento {
 	 * attraverso dei metodi privati e pubblici prima di essere utilizzati
 	 * per la creazione di un {@code Appuntamento}.<br>
 	 * In particolare, il metodo {@link #controlloPer} verifica se il parametro passato
-	 * come argomento è valido per la creazione di un {@code Appuntamento}, dato un {@link TipoControllo};<br>
+	 * come argomento è valido per la creazione di un {@code Appuntamento}, dato un {@link TipoControllo}.<br>
 	 * Se i parametri superano questa fase di controllo, allora l'appuntamento verrà creato con questi dati.
 	 */
 	
@@ -214,16 +213,7 @@ public class Appuntamento {
 			 */
 			CONTROLLO_NOME
 		}
-		
-		private static HashMap<TipoControllo, ControlloMappato> creaControlliMappati() {
-			HashMap<TipoControllo, ControlloMappato> controlliMappati = new HashMap<>();
-			controlliMappati.put(TipoControllo.CONTROLLO_DATA, new ControlloMappato(TipoControllo.CONTROLLO_DATA));
-			controlliMappati.put(TipoControllo.CONTROLLO_ORARIO, new ControlloMappato(TipoControllo.CONTROLLO_ORARIO));
-			controlliMappati.put(TipoControllo.CONTROLLO_DURATA, new ControlloMappato(TipoControllo.CONTROLLO_DURATA));
-			controlliMappati.put(TipoControllo.CONTROLLO_LUOGO, new ControlloMappato(TipoControllo.CONTROLLO_LUOGO));
-			controlliMappati.put(TipoControllo.CONTROLLO_NOME, new ControlloMappato(TipoControllo.CONTROLLO_NOME));
-			return controlliMappati;
-		}
+
 		
 		private static boolean isDataTimeValid(String format, String dataTime){
 			try {
@@ -264,11 +254,11 @@ public class Appuntamento {
 		}
 		
 		private static void testParametri(String data, String orario, String durata, String luogo, String nome) throws AppuntamentoException {
-			HashMap<TipoControllo, ControlloMappato> controlliMappati = creaControlliMappati();
 			String[] parametri = { data, orario, durata, luogo, nome };
 			int indice = 0;
-			for(TipoControllo controllo: TipoControllo.values()) {
-				if(!controlliMappati.get(controllo).test(parametri[indice++])) throw controlliMappati.get(controllo).getAppuntamentoException();
+			for(TipoControllo tc: TipoControllo.values()) {
+				ControlloMappato cm = new ControlloMappato(tc);
+				if(!cm.test(parametri[indice++])) throw cm.getAppuntamentoException();
 			}
 		}
 	}
