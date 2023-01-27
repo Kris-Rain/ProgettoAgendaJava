@@ -22,8 +22,8 @@ import codice.Appuntamento.ControlloDati.TipoControllo;
  * @see ContenitoreAgende
  * @see RequestApp
  * 
- * @author Nicolò Bianchetto
- * @author Kristian Rigo
+ * @author Kristian Rigo (matr. 20046665)
+ * @author Nicolò Bianchetto (matr. 20026606)
  */
 
 public class Interfaccia {
