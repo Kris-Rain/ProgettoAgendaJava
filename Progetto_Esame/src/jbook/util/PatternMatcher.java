@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 /**
  * {@code PatternMatcher} è una semplice classe che facilita
- * l'utilizzo delle classi {@link Pattern} e {@link Matcher}. Questo 
+ * l'utilizzo delle classi {@link Pattern} e {@link Matcher}. Utile 
  * specialmente nei casi ove è necessario creare un singolo {@code Pattern}
  * per un singolo {@code Matcher}. Negli altri casi, è ovviamente preferibile
  * dichiarare tali classi separatamente.
