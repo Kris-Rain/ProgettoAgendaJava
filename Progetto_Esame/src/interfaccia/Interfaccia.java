@@ -27,10 +27,10 @@ import codice.Appuntamento.ControlloDati.TipoControllo;
  */
 
 public class Interfaccia {
-	private static final String ANSI_RESET = "\u001B[0m";
-	private static final String ANSI_GREEN = "\u001B[32m";
-	private static final String ANSI_YELLOW = "\u001B[33m";
-	private static final String YELLOW_BRIGHT = "\033[0;93m";
+	private static final String COLOR_RESET = "\u001B[0m";
+	private static final String COLOR_GREEN = "\u001B[32m";
+	private static final String COLOR_YELLOW = "\u001B[33m";
+	private static final String COLOR_YELLOW_BRIGHT = "\033[0;93m";
 	
     private static ContenitoreAgende box = new ContenitoreAgende();
 
@@ -48,7 +48,7 @@ public class Interfaccia {
 					menuSingolaAgenda(box.selezionaAgenda(selected));
 				}
 				catch(NoSuchElementException e) {
-					System.out.println(ANSI_YELLOW+"\nATTENZIONE: L'agenda non esiste!\n"+ANSI_RESET);
+					System.out.println(COLOR_YELLOW+"\nATTENZIONE: L'agenda non esiste!\n"+COLOR_RESET);
 				}
 			}
 			case "2", "aggiungi", "aggiungi agenda" -> aggiungiAgenda();
@@ -58,25 +58,25 @@ public class Interfaccia {
 					rimuoviAgenda(box.selezionaAgenda(selected));
 				}
 				catch(NoSuchElementException e) {
-					System.out.println(ANSI_YELLOW+"\nATTENZIONE: l'agenda non esiste!"+ANSI_RESET);
+					System.out.println(COLOR_YELLOW+"\nATTENZIONE: l'agenda non esiste!"+COLOR_RESET);
 				}
 			}
 			case "4", "quit", "esci", "q" -> terminate();
-			default -> System.out.println(ANSI_YELLOW+"ATTENZIONE: la scelta effettuata non è valida."+ANSI_RESET);
+			default -> System.out.println(COLOR_YELLOW+"ATTENZIONE: la scelta effettuata non è valida."+COLOR_RESET);
 		}
 	}
 	
 	private static void rimuoviAgenda(Agenda agenda) {
-		if(askSomething(YELLOW_BRIGHT+"Sei sicuro di voler rimuovere l'agenda? "+ANSI_RESET)) {
-			if(agenda.isSaved() && askSomething(YELLOW_BRIGHT+"Vuoi eliminare anche il file? "+ANSI_RESET)) {
-				if(new File(Agenda.getFilesPath(), agenda.getNomeAgenda()+".txt").delete()) System.out.println(ANSI_GREEN+"\n*** Eliminazione del file avvenuta con successo ***"+ANSI_RESET);
+		if(askSomething(COLOR_YELLOW_BRIGHT+"Sei sicuro di voler rimuovere l'agenda? "+COLOR_RESET)) {
+			if(agenda.isSaved() && askSomething(COLOR_YELLOW_BRIGHT+"Vuoi eliminare anche il file? "+COLOR_RESET)) {
+				if(new File(Agenda.getFilesPath(), agenda.getNomeAgenda()+".txt").delete()) System.out.println(COLOR_GREEN+"\n*** Eliminazione del file avvenuta con successo ***"+COLOR_RESET);
 				else System.err.println("\n*** Impossibile eliminare il file! ***\n");
 			}
 			box.removeAgenda(agenda.getNomeAgenda());
-			System.out.println(ANSI_GREEN+"\n*** Rimozione agenda avvenuta con successo ***\n"+ANSI_RESET);
+			System.out.println(COLOR_GREEN+"\n*** Rimozione agenda avvenuta con successo ***\n"+COLOR_RESET);
 			
 		}
-		else System.out.println(ANSI_GREEN+"\n*** Rimozione annullata ***\n"+ANSI_RESET);
+		else System.out.println(COLOR_GREEN+"\n*** Rimozione annullata ***\n"+COLOR_RESET);
 	}
 	
 	private static void aggiungiAgenda() {
@@ -84,13 +84,13 @@ public class Interfaccia {
 			switch(Input.readString("Creare una nuova agenda (c) o importarla da file (i)? ").toLowerCase().strip()) {
 			case "c", "crea", "creare", "crea agenda", "crea nuova", "creare nuova", "crea nuova agenda", "creare nuova agenda" -> {
 				System.out.println(box.aggiungiAgenda(Input.readString("Inserire nome agenda: ")) ? 
-						ANSI_GREEN+"\n*** Agenda aggiunta con successo ***\n"+ANSI_RESET : ANSI_YELLOW+"\nATTENZIONE! Impossibile aggiungere l'agenda con il medesimo nome di un'altra!\n"+ANSI_RESET);
+						COLOR_GREEN+"\n*** Agenda aggiunta con successo ***\n"+COLOR_RESET : COLOR_YELLOW+"\nATTENZIONE! Impossibile aggiungere l'agenda con il medesimo nome di un'altra!\n"+COLOR_RESET);
 				return;
 			}
 			case "i", "importa", "importare", "importa da file", "importa file", "import" -> {
 				try {
 					System.out.println(box.caricaAgendaDaFile(Input.readString("Inserire nome del file da cui importare l'agenda: ")) ? 
-							ANSI_GREEN+"\n*** Agenda aggiunta con successo ***\n"+ANSI_RESET : ANSI_YELLOW+"\nATTENZIONE! Impossibile aggiungere l'agenda con il medesimo nome di un'altra!\n"+ANSI_RESET);
+							COLOR_GREEN+"\n*** Agenda aggiunta con successo ***\n"+COLOR_RESET : COLOR_YELLOW+"\nATTENZIONE! Impossibile aggiungere l'agenda con il medesimo nome di un'altra!\n"+COLOR_RESET);
 					return;
 				}
 				catch(IOException e) {
@@ -98,7 +98,7 @@ public class Interfaccia {
 					return;
 				}
 			}
-			default -> System.out.println(ANSI_YELLOW+"Attenzione, la scelta effettuata non è valida."+ANSI_RESET);
+			default -> System.out.println(COLOR_YELLOW+"Attenzione, la scelta effettuata non è valida."+COLOR_RESET);
 			}
 		}
 	}
@@ -123,22 +123,22 @@ public class Interfaccia {
         		case "5", "salva", "salva agenda" -> {
         			try { 
         				agenda.salvaAgendaSuFile();
-        				System.out.println(ANSI_GREEN+"\n*** Salvataggio Agenda su file avvenuto con successo ***"+ANSI_RESET);
+        				System.out.println(COLOR_GREEN+"\n*** Salvataggio Agenda su file avvenuto con successo ***"+COLOR_RESET);
 					} catch (IOException e) {
 						System.err.println("\nATTENZIONE: salvataggio agenda su file non riuscito.");
 					}
         		}
         		case "6", "modifica", "modifica nome", "modifica nome agenda" -> modificaNomeAgenda(agenda);
         		case "r", "ritorna", "return" -> { return; }
-        		default -> System.out.println(ANSI_YELLOW+"Attenzione, la scelta effettuata non è valida."+ANSI_RESET);
+        		default -> System.out.println(COLOR_YELLOW+"Attenzione, la scelta effettuata non è valida."+COLOR_RESET);
         	}
     	}
     }
     
     private static void modificaNomeAgenda(Agenda agenda) {
         if(box.modificaNomeAgenda(agenda.getNomeAgenda(), Input.readString("Inserire il nuovo nome: "))) {
-            System.out.println(ANSI_GREEN+"\nNuovo nome impostato con successo: " + agenda.getNomeAgenda() + "\n"+ANSI_RESET);
-        } else System.out.println(ANSI_YELLOW+"\nModifica non riuscita: il nome inserito è già esistente "+ANSI_RESET);
+            System.out.println(COLOR_GREEN+"\nNuovo nome impostato con successo: " + agenda.getNomeAgenda() + "\n"+COLOR_RESET);
+        } else System.out.println(COLOR_YELLOW+"\nModifica non riuscita: il nome inserito è già esistente "+COLOR_RESET);
     }
     
     private static String controlloDatoAppuntamento(TipoControllo tc, String request, String errMessage) {
@@ -147,7 +147,7 @@ public class Interfaccia {
     	do {
     		result = Input.readString(request).strip();
     		pass = ControlloDati.controlloPer(tc, result);
-    		if(!pass) System.out.println(ANSI_YELLOW+errMessage+ANSI_RESET);
+    		if(!pass) System.out.println(COLOR_YELLOW+errMessage+COLOR_RESET);
     	}	while(!pass);
     	return result;
     }
@@ -159,16 +159,16 @@ public class Interfaccia {
     		switch(Input.readString("Si desidera elencare per:\n1) Data\n2) Persona\n3) Tutto\nInserire un'opzione: ").strip().toLowerCase()) {
 	    		case "1", "data" -> {
 	    			String data = Input.readString("Inserire la data degli appuntamenti da elencare: ").strip();
-	    			System.out.println( agenda.elencaPerData(data).isEmpty() ? ANSI_YELLOW+"\n*** Nessun Appuntamento trovato con questa data ***"+ANSI_RESET : "\n"+agenda.elencaPerData(data));
+	    			System.out.println( agenda.elencaPerData(data).isEmpty() ? COLOR_YELLOW+"\n*** Nessun Appuntamento trovato con questa data ***"+COLOR_RESET : "\n"+agenda.elencaPerData(data));
 	    			return;
 	    		}
 	    		case "2", "persona" -> {
 	    			String persona = Input.readString("Inserire il nome della persona con cui effettuare la ricerca: ").strip();
-	    			System.out.println( agenda.elencaPerPersona(persona).isEmpty() ? ANSI_YELLOW+"\n*** Nessun Appuntamento trovato con questa persona ***"+ANSI_RESET : "\n"+agenda.elencaPerPersona(persona));
+	    			System.out.println( agenda.elencaPerPersona(persona).isEmpty() ? COLOR_YELLOW+"\n*** Nessun Appuntamento trovato con questa persona ***"+COLOR_RESET : "\n"+agenda.elencaPerPersona(persona));
 	    			return;
 	    		}
-	    		case "3", "tutto" -> { System.out.println( agenda.toString().isEmpty() ? ANSI_YELLOW+"\n*** Agenda Vuota ***"+ANSI_RESET : "\n"+agenda.toString() ); return; }
-	    		default -> System.out.println(ANSI_YELLOW+"Attenzione, la scelta effettuata non è valida."+ANSI_RESET);
+	    		case "3", "tutto" -> { System.out.println( agenda.toString().isEmpty() ? COLOR_YELLOW+"\n*** Agenda Vuota ***"+COLOR_RESET : "\n"+agenda.toString() ); return; }
+	    		default -> System.out.println(COLOR_YELLOW+"Attenzione, la scelta effettuata non è valida."+COLOR_RESET);
     		}
     	}
     }
@@ -185,18 +185,18 @@ public class Interfaccia {
     	for(TipoControllo tc : TipoControllo.values()) {
     		parametri[index++] = controlloDatoAppuntamento(tc, requests.get(tc).REQUEST, requests.get(tc).ERR_MESSAGE);
     	}
-    	if(agenda.aggiungiAppuntamento(parametri[0], parametri[1], parametri[2], parametri[3], parametri[4])) System.out.println(ANSI_GREEN+"\n*** Appuntamento aggiunto con successo ***"+ANSI_RESET);
-    	else System.out.println(ANSI_YELLOW+"\nATTENZIONE: Appuntamento non compatibile con l'agenda"+ANSI_RESET);
+    	if(agenda.aggiungiAppuntamento(parametri[0], parametri[1], parametri[2], parametri[3], parametri[4])) System.out.println(COLOR_GREEN+"\n*** Appuntamento aggiunto con successo ***"+COLOR_RESET);
+    	else System.out.println(COLOR_YELLOW+"\nATTENZIONE: Appuntamento non compatibile con l'agenda"+COLOR_RESET);
     }
     
     private static void rimuoviPer(Agenda agenda, String request, BiPredicate<Agenda, String> removeMethod, BiPredicate<Agenda, String> isEmpty) {
     	String value = Input.readString(request).strip();
-		if(isEmpty.test(agenda, value)) System.out.println(ANSI_YELLOW+"\nATTENZIONE: Appuntamento/i non esistenti nell'Agenda."+ANSI_RESET);
-		else if(askSomething(YELLOW_BRIGHT+"Appuntamento/i trovati. Sei sicuro di voler procedere all'eliminazione? "+ANSI_RESET)) {
+		if(isEmpty.test(agenda, value)) System.out.println(COLOR_YELLOW+"\nATTENZIONE: Appuntamento/i non esistenti nell'Agenda."+COLOR_RESET);
+		else if(askSomething(COLOR_YELLOW_BRIGHT+"Appuntamento/i trovati. Sei sicuro di voler procedere all'eliminazione? "+COLOR_RESET)) {
 				removeMethod.test(agenda, value);
-				System.out.println(ANSI_GREEN+"\n*** Rimozione completata ***"+ANSI_RESET);
+				System.out.println(COLOR_GREEN+"\n*** Rimozione completata ***"+COLOR_RESET);
 		} 
-		else System.out.println(ANSI_GREEN+"\n*** Rimozione annullata ***"+ANSI_RESET);
+		else System.out.println(COLOR_GREEN+"\n*** Rimozione annullata ***"+COLOR_RESET);
     }
     
     private static void rimuoviAppuntamento(Agenda agenda) {
@@ -217,14 +217,14 @@ public class Interfaccia {
     				return;
     			}
     			case "4", "tutto", "rimuovi tutto" -> {
-    				if(askSomething(YELLOW_BRIGHT+"Sei sicuro di voler eliminare tutti gli appuntamenti? "+ANSI_RESET)) {
+    				if(askSomething(COLOR_YELLOW_BRIGHT+"Sei sicuro di voler eliminare tutti gli appuntamenti? "+COLOR_RESET)) {
     					agenda.rimuoviTutto();
-    					System.out.println(ANSI_GREEN+"\n*** Appuntamenti eliminati ***"+ANSI_RESET);
-    				} else System.out.println(ANSI_GREEN+"\n*** Rimozione annullata ***"+ANSI_RESET);
+    					System.out.println(COLOR_GREEN+"\n*** Appuntamenti eliminati ***"+COLOR_RESET);
+    				} else System.out.println(COLOR_GREEN+"\n*** Rimozione annullata ***"+COLOR_RESET);
     				return;
     			}
     			case "r", "annulla" -> { return; }
-    			default -> System.out.println(ANSI_YELLOW+"Attenzione, la scelta effettuata non è valida."+ANSI_RESET);
+    			default -> System.out.println(COLOR_YELLOW+"Attenzione, la scelta effettuata non è valida."+COLOR_RESET);
     		}
     	}
     }
@@ -237,22 +237,22 @@ public class Interfaccia {
     				Input.readString("Inserire nome parametro da modificare (data, orario, durata, luogo, persona): "),
     				Input.readString("Inserire nuovo valore da inserire: ").strip());
     		switch(risultato) {
-    			case 0 -> System.out.println(ANSI_YELLOW+"ATTENZIONE: l'Appuntamento selezionato non è esistente."+ANSI_RESET);
-    			case 1 -> System.out.println(ANSI_GREEN+"\n*** Modifica avvenuta con successo ***"+ANSI_RESET);
-    			case -1 -> System.out.println(ANSI_YELLOW+"ATTENZIONE: non è stato possibile modificare l'appuntamento poiché l'avrebbe reso non compatibile con l'Agenda."+ANSI_RESET);
-    			case -2 -> System.out.println(ANSI_YELLOW+"ATTENZIONE: uno o più parametri inseriti non sono nel formato corretto"+ANSI_RESET);
-    			case -3 -> System.out.println(ANSI_YELLOW+"ATTENZIONE: il nome del parametro da modificare non identifica alcun campo."+ANSI_RESET);
+    			case 0 -> System.out.println(COLOR_YELLOW+"ATTENZIONE: l'Appuntamento selezionato non è esistente."+COLOR_RESET);
+    			case 1 -> System.out.println(COLOR_GREEN+"\n*** Modifica avvenuta con successo ***"+COLOR_RESET);
+    			case -1 -> System.out.println(COLOR_YELLOW+"ATTENZIONE: non è stato possibile modificare l'appuntamento poiché l'avrebbe reso non compatibile con l'Agenda."+COLOR_RESET);
+    			case -2 -> System.out.println(COLOR_YELLOW+"ATTENZIONE: uno o più parametri inseriti non sono nel formato corretto"+COLOR_RESET);
+    			case -3 -> System.out.println(COLOR_YELLOW+"ATTENZIONE: il nome del parametro da modificare non identifica alcun campo."+COLOR_RESET);
     		}
-    		if(risultato != 1) repeat = askSomething(YELLOW_BRIGHT+"Si desidera riprovare la modifica? "+ANSI_RESET); else repeat = false;	
+    		if(risultato != 1) repeat = askSomething(COLOR_YELLOW_BRIGHT+"Si desidera riprovare la modifica? "+COLOR_RESET); else repeat = false;	
     	} while(repeat);
     }
     
     private static void terminate() {
     	if(!box.allSaved()) {
-    		if(askSomething(YELLOW_BRIGHT+"Alcune agende non sono state salvate, si desidera salvarle? "+ANSI_RESET)) {
+    		if(askSomething(COLOR_YELLOW_BRIGHT+"Alcune agende non sono state salvate, si desidera salvarle? "+COLOR_RESET)) {
     			try {
     				box.salvaContenitoreSuFile();
-    				System.out.println(ANSI_GREEN+"\n*** Salvataggio delle agende avvenuto con successo ***"+ANSI_RESET);
+    				System.out.println(COLOR_GREEN+"\n*** Salvataggio delle agende avvenuto con successo ***"+COLOR_RESET);
     			} catch(IOException e) { abort("\nATTENZIONE: salvataggio agende fallito.", e); }
     		}
     	}
@@ -272,7 +272,7 @@ public class Interfaccia {
             switch(risposta) {
                 case "y", "yes", "ye", "yeah", "yea", "si", "sì", "ja", "oui", "affermative" -> conferma = true;
                 case "n", "no", "nop", "nope", "non", "not", "nein", "negative" -> conferma = false;
-                default -> System.out.println(ANSI_YELLOW+"Attenzione, la scelta effettuata non è valida."+ANSI_RESET);
+                default -> System.out.println(COLOR_YELLOW+"Attenzione, la scelta effettuata non è valida."+COLOR_RESET);
             }
         } while(conferma == null);
 
@@ -281,7 +281,7 @@ public class Interfaccia {
     
     public static void main(String[] args) {
     	try {	
-    		if(!inizializzaAgende()) System.out.println(ANSI_YELLOW+"Attenzione: non è stato possibile caricare alcune agende."+ANSI_RESET);
+    		if(!inizializzaAgende()) System.out.println(COLOR_YELLOW+"Attenzione: non è stato possibile caricare alcune agende."+COLOR_RESET);
     	} catch(IOException e) { 
     		abort("ATTENZIONE! Impossibile inizializzare:", e);
     	}
