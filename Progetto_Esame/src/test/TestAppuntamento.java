@@ -35,7 +35,7 @@ class TestAppuntamento {
 		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_ORARIO, a1.getOrario()));
 		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_DURATA, a1.getDurata()));
 		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_LUOGO, a1.getLuogo()));
-		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, a1.getPersona()));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_PERSONA, a1.getPersona()));
 		
 		String[] param={"01-02-1998", "09-00", "80", "Sala Conferenze", "Luca"};
 		String[] param2={"01-02-1998", "09-00", "80", "Sala Conferenze", "Luca"};
@@ -49,6 +49,8 @@ class TestAppuntamento {
 		assertThrows(AppuntamentoException.class, () -> new Appuntamento(param4));
 		assertThrows(AppuntamentoException.class, () -> new Appuntamento(param5));
 		assertThrows(AppuntamentoException.class, () -> new Appuntamento(param6));
+		assertThrows(IndexOutOfBoundsException.class, () -> new Appuntamento(new String[]{"01-02-1998", "09-00", "80", "Sala Conferenze"}));
+		assertDoesNotThrow(() -> new Appuntamento(new String[]{"01-02-1998", "09-00", "80", "Sala Conferenze", "Luca", "Extra", "oltre", "3483"}));
 	}
 	
 	@Test
@@ -72,18 +74,18 @@ class TestAppuntamento {
 	
 	@Test
 	void testControlloNome() {
-		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, "  "));
-		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, " "));
-		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, ""));
-		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, "$(!$)!"));
-		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, "NomeTroppoLungoLungoooo CognomeTroppoLungoLungo"));
-		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, "1234"));
-		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, "A"));
-		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, "Luca"));
-		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, "Paolo Bonolis"));
-		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, "Luca98 Bianchi"));
-		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, "MARCO"));
-		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_NOME, "Giovanni1234"));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_PERSONA, "  "));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_PERSONA, " "));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_PERSONA, ""));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_PERSONA, "$(!$)!"));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_PERSONA, "NomeTroppoLungoLungoooo CognomeTroppoLungoLungo"));
+		assertFalse(ControlloDati.controlloPer(TipoControllo.CONTROLLO_PERSONA, "1234"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_PERSONA, "A"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_PERSONA, "Luca"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_PERSONA, "Paolo Bonolis"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_PERSONA, "Luca98 Bianchi"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_PERSONA, "MARCO"));
+		assertTrue(ControlloDati.controlloPer(TipoControllo.CONTROLLO_PERSONA, "Giovanni1234"));
 	}
 	
 	@Test
