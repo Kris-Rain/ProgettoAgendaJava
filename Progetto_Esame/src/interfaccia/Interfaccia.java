@@ -180,7 +180,7 @@ public class Interfaccia {
     	requests.put(TipoControllo.CONTROLLO_ORARIO, new RequestApp("Inserire un orario valido nel formato HH-mm: ", "L'orario non è valido!"));
     	requests.put(TipoControllo.CONTROLLO_DURATA, new RequestApp("Inserire una durata in minuti valida (solo valori interi): ", "La durata non è valida!"));
     	requests.put(TipoControllo.CONTROLLO_LUOGO, new RequestApp("Inserire il nome di un luogo valido (sono ammessi solo caratteri alfabetici o al più indirizzi (numero indirizzo alla fine, separato da spazio)): ", "Il luogo non è valido!"));
-    	requests.put(TipoControllo.CONTROLLO_NOME, new RequestApp("Inserire il nome della persona con cui si ha l'appuntamento (ammessi solo caratteri alfanumerici, ma NON SOLO numeri): ", "Il nome non è valido!"));
+    	requests.put(TipoControllo.CONTROLLO_PERSONA, new RequestApp("Inserire il nome della persona con cui si ha l'appuntamento (ammessi solo caratteri alfanumerici, ma NON SOLO numeri): ", "Il nome non è valido!"));
     	int index = 0;
     	for(TipoControllo tc : TipoControllo.values()) {
     		parametri[index++] = controlloDatoAppuntamento(tc, requests.get(tc).REQUEST, requests.get(tc).ERR_MESSAGE);
