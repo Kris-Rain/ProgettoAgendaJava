@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
@@ -164,9 +165,10 @@ public class Agenda implements Iterable<Appuntamento> {
 	 * 
 	 * @param file la rappresentazione astratta del file da cui leggere.
 	 * @throws IOException se si è verificata un'eccezione di I/O durante la lettura da file.
+	 * @throws FileNotFoundException se il file non esiste.
 	 */
 
-	public Agenda(File file) throws IOException {
+	public Agenda(File file) throws IOException, FileNotFoundException {
 		
 		BufferedReader reader = new BufferedReader(new FileReader(file));
 		
@@ -505,7 +507,7 @@ public class Agenda implements Iterable<Appuntamento> {
 	 * altrimenti ritorna {@code false}. 
 	 * 
 	 * <p><em>Per maggiori informazioni sui controlli dei parametri vedi anche:</em><br>
-	 * {@link Appuntamento.ControlloDati#controlloPer(Appuntamento.ControlloDati.TipoControllo, String)}<br>
+	 * {@link Appuntamento.ControlloDati.TipoControllo}<br>
 	 * 
 	 * @param data la data dell'appuntamento da aggiungere nel formato {@code dd-MM-uuuu}.
 	 * @param orario l'orario dell'appuntamento da aggiungere nel formato {@code HH-mm}.
@@ -537,7 +539,7 @@ public class Agenda implements Iterable<Appuntamento> {
 	 * uno spazio. Eventuali altri valori (se separati da spazi) vengono ignorati.
 	 * 
 	 * <p><em>Per maggiori informazioni sui controlli dei parametri vedi anche:</em><br>
-	 * {@link Appuntamento.ControlloDati#controlloPer(Appuntamento.ControlloDati.TipoControllo, String)}<br>
+	 * {@link Appuntamento.ControlloDati.TipoControllo}<br><br>
 	 * 
 	 * @param dataOrario la data e l'orario dell'appuntamento da aggiungere nel formato {@code dd-MM-uuuu HH-mm}.
 	 * @param durata la durata dell'appuntamento da aggiungere di tipo {@code String}.
@@ -665,7 +667,7 @@ public class Agenda implements Iterable<Appuntamento> {
 	 * <li> La modifica non deve rendere l'appuntamento incompatibile con l'agenda;<br>
 	 * <li> Il nuovo valore deve avere il formato corretto a seconda del parametro che va a modificare.</ul>
 	 * <em><br>Per maggiori informazioni sui controlli dei parametri vedi anche:</em><br>
-	 * {@link Appuntamento.ControlloDati#controlloPer(Appuntamento.ControlloDati.TipoControllo, String)}<br>
+	 * {@link Appuntamento.ControlloDati.TipoControllo}<br><br>
 	 * 
 	 * 
 	 * @param dataApp data dell'appuntamento da modificare nel formato {@code dd-MM-uuuu}
@@ -712,7 +714,7 @@ public class Agenda implements Iterable<Appuntamento> {
 	 * <li> La modifica non deve rendere l'appuntamento incompatibile con l'agenda;<br>
 	 * <li> Il nuovo valore deve avere il formato corretto a seconda del parametro che va a modificare.</ul>
 	 * <em><br>vedi anche:</em><br>
-	 * {@link Appuntamento.ControlloDati#controlloPer(Appuntamento.ControlloDati.TipoControllo, String)}<br>
+	 * {@link Appuntamento.ControlloDati.TipoControllo}<br><br>
 	 * 
 	 * 
 	 * @param dataOrarioApp data e orario dell'appuntamento da modificare nel formato {@code dd-MM-uuuu HH-mm}
@@ -797,5 +799,5 @@ public class Agenda implements Iterable<Appuntamento> {
 		String[] splitted = dataOrario.split("(\\s)+");
 		return splitted.length == 1 ? new String[] {dataOrario, ""} : splitted;
 	}
-	
+
 }
