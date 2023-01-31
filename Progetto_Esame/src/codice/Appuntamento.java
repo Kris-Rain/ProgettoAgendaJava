@@ -5,6 +5,8 @@ import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
+
+import jbook.util.DataOrario;
 import jbook.util.PatternMatcher;
 
 /**
@@ -135,7 +137,7 @@ public class Appuntamento {
 						controllo = luogo -> PatternMatcher.create("^[a-z]{1,20}(\\s)?[a-z]{0,20}(\\s[0-9]{0,4})?$", luogo, Pattern.CASE_INSENSITIVE).matches();
 						exception = new AppuntamentoException("Luogo non valido!");
 					}
-					case CONTROLLO_NOME -> {
+					case CONTROLLO_PERSONA -> {
 						controllo = nome -> PatternMatcher.create("^(?![0-9]+$)[a-z0-9]{1,20}(\\s)?[a-z0-9]{0,20}$", nome, Pattern.CASE_INSENSITIVE).matches();
 						exception = new AppuntamentoException("Nome non valido!");
 					}
@@ -153,15 +155,15 @@ public class Appuntamento {
 		}
 		
 		/**
-		 * Una semplice enumarazione di tutti i tipi di controllo che
-		 * verranno utilizzati per validare i parametri, durante la creazione
+		 * Una semplice enumarazione, di tutti i tipi di controllo, utilizzata
+		 * per validare i parametri durante la creazione
 		 * di un nuovo {@code Appuntamento}.<p>
 		 * A seconda del tipo di controllo selezionato:<ul>
 		 * <li> {@link #CONTROLLO_DATA} -> nel caso di validazione della data;
 		 * <li> {@link #CONTROLLO_ORARIO} -> nel caso di validazione dell'orario;
 		 * <li> {@link #CONTROLLO_DURATA} -> nel caso di validazione della durata;
 		 * <li> {@link #CONTROLLO_LUOGO} -> nel caso di validazione del luogo;
-		 * <li> {@link #CONTROLLO_NOME} -> nel caso di validazione del nome della persona;</ul>
+		 * <li> {@link #CONTROLLO_PERSONA} -> nel caso di validazione del nome della persona;</ul>
 		 */
 		
 		public enum TipoControllo {
@@ -211,7 +213,7 @@ public class Appuntamento {
 			 * Accettati: <em>"Luca99"</em>, <em>"Marco Rossi"</em>;
 			 * Non accettati: <em>"1998"</em>, <em>"$(!$)!"</em>, <em>"1234"</em>.</pre></blockquote>
 			 */
-			CONTROLLO_NOME
+			CONTROLLO_PERSONA
 		}
 		
 		private static boolean isDataTimeValid(String format, String dataTime){
@@ -293,6 +295,10 @@ public class Appuntamento {
 	
 	/**
 	 * Crea un nuovo {@code Appuntamento} attraverso gli elementi dell'array <strong>{@code parametri}</strong>.
+	 * <p>Vengono considerati i primi 5 indici dell'array. Se l'array contiene meno parametri del dovuto, verrà
+	 * sollevata un'eccezione {@link IndexOutOfBoundsException}.<br>
+	 * Se, invece, l'array ne contiene di più di quelli richiesti, quelli in eccesso verranno ignorati.
+	 * 
 	 * 
 	 * @param parametri di tipo {@code String[]} che descrive l'insieme dei dati per la creazione di un {@code Appuntamento}.
 	 * @throws AppuntamentoException se i parametri passati come argomento non superano i controlli.
@@ -375,7 +381,7 @@ public class Appuntamento {
 	/**
 	 * Crea un {@link PatternMatcher} confrontando il nome persona di quest'appuntamento
 	 * con la stringa {@code nome} passata come argomento, utilizzando la flag {@code CASE_INSENSITIVE}
-	 * in modo tale che le stringhe vengano confrontate non considerando le maiuscole.<br>
+	 * in modo tale che le stringhe vengano confrontate non considerando il <em>case</em> dei caratteri.<br>
 	 * 
 	 * @param nome che identifica il nome della persona che si vuole confrontare.
 	 * @return {@code true} se sono uguali, {@code false} altrimenti.
@@ -411,30 +417,26 @@ public class Appuntamento {
 	}
 	
 	/**
-	 * Controlla se questo {@code Appuntamento} inizia dopo la fine dell'appuntamento 
-	 * passato come argomento, per controllare la compatibilità prima di essere aggiunto
-	 * nell'{@link Agenda}.<br>
+	 * Controlla se questo {@code Appuntamento} inizia <strong>dopo</strong> la fine dell'appuntamento 
+	 * passato come argomento.
 	 * 
-	 * @param other appuntamento da aggiungere che deve terminare prima di questo {@code Appuntamento}.
-	 * @return {@code true} se questo {@code Appuntamento} inizia dopo other, {@code false} altrimenti.
+	 * @param other appuntamento da confrontare.
+	 * @return {@code true} se questo {@code Appuntamento} inizia dopo <strong>other</strong>, {@code false} altrimenti.
 	 */
 	
 	public boolean isAfter(Appuntamento other) {
-		//Se inizio dopo che l'altro finisca, ritorno true
 		return (this.dataTimeInizio.compareTo(other.getDataTimeFine()) >= 0);
 	}
 	
 	/**
-	 * Controlla se questo {@code Appuntamento} termina prima dell'inizio dell'appuntamento 
-	 * passato come argomento, per controllare la compatibilità prima di essere aggiunto
-	 * nell'{@link Agenda}.<br>
+	 * Controlla se questo {@code Appuntamento} termina <strong>prima</strong> dell'inizio dell'appuntamento 
+	 * passato come argomento.
 	 * 
-	 * @param other appuntamento da aggiungere che deve iniziare dopo la fine di questo {@code Appuntamento}.
-	 * @return {@code true} se questo {@code Appuntamento} termina prima di other, {@code false} altrimenti.
+	 * @param other appuntamento da confrontare.
+	 * @return {@code true} se questo {@code Appuntamento} termina prima di <strong>other</strong>, {@code false} altrimenti.
 	 */
 	
 	public boolean isBefore(Appuntamento other) {
-		//Se finisco prima che l'altro inizi, ritorno true
 		return (this.dataTimeFine.compareTo(other.getDataTimeInizio()) <= 0);
 	}
 	
@@ -473,7 +475,7 @@ public class Appuntamento {
 	 * <li> il {@code dataTimeFine} dell'appuntamento deve essere il medesimo;
 	 * <li> la {@code durata} dell'appuntamento deve essere il medesimo;
 	 * <li> il {@code luogo} dell'appuntamento deve essere il medesimo;
-	 * <li> il {@code nome persona} dell'appuntamento deve essere il medesimo;</ul>
+	 * <li> il {@code nomePersona} dell'appuntamento deve essere il medesimo;</ul>
 	 * <p>Restituisce {@code true} se queste condizioni sono soddisfatte.
 	 * 
 	 * @param object il riferimento all'oggetto da comparare.
