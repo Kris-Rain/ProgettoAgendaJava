@@ -336,11 +336,10 @@ public class ContenitoreAgende implements Iterable<Agenda> {
 	}
 
 	/**
-	 * Ritorna un {@code IteratoreContenitoreAgende} per questo {@code ContenitoreAgende}, utile a iterare su ogni
+	 * Ritorna un {@link Iterator} per questo {@code ContenitoreAgende}, utile a iterare su ogni
 	 * {@code Agenda}.
-	 * <p>{@code IteratoreContenitoreAgende} implementa l'interfaccia {@link Iterator}.
 	 * 
-	 * @return un nuovo {@code IteratoreContenitoreAgende} di questo contenitore.
+	 * @return un nuovo {@code Iterator<Agenda>}.
 	 */
 	
 	@Override
