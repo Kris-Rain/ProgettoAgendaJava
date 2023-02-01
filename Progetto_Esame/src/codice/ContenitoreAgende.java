@@ -314,7 +314,7 @@ public class ContenitoreAgende implements Iterable<Agenda> {
 	
 	/**
 	 * Ritorna un elenco dei nomi delle agende presenti nel {@code ContenitoreAgende}. Se l'agenda è <em>non salvata</em>,
-	 * viene aggiunto un asterisco identificativo a fine nome. I nomi delle agende sono elencati in ordine alfabetico.
+	 * viene aggiunto un asterisco identificativo a fine nome. I nomi delle agende sono elencati in ordine lessicografico.
 	 * 
 	 * @return un elenco, di tipo {@code String}, dei nomi delle agende presenti in questo {@code ContenitoreAgende}.
 	 */
@@ -325,7 +325,7 @@ public class ContenitoreAgende implements Iterable<Agenda> {
 	
 	/**
 	 * Ritorna una rappresentazione in stringa di questo {@code ContenitoreAgende}. Le agende sono elencate in ordine
-	 * alfabetico.
+	 * lessicografico.
 	 * 
 	 * @return una rappresentazione di tipo {@code String} di questo {@code ContenitoreAgende}.
 	 */
