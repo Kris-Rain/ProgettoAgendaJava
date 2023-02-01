@@ -115,9 +115,10 @@ public class ContenitoreAgende implements Iterable<Agenda> {
 	 * @param fileName il nome del file da cui caricare l'agenda.
 	 * @return {@code true} se l'agenda è stata aggiunta al contenitore, {@code false} altrimenti.
 	 * @throws IOException se si è verificata un'eccezione di I/O durante la lettura da file.
+	 * @throws FileNotFoundException se il file non esiste.
 	 */
 	
-	public boolean caricaAgendaDaFile(String fileName) throws IOException {
+	public boolean caricaAgendaDaFile(String fileName) throws IOException, FileNotFoundException {
 		File file = new File(Agenda.getFilesPath(), fileName);	
 		Agenda newAgenda = new Agenda(file);
 		return (this.contains(newAgenda.getNomeAgenda())) ? false : agende.add(newAgenda);
