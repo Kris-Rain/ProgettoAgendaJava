@@ -745,11 +745,10 @@ public class Agenda implements Iterable<Appuntamento> {
 	}
 	
 	/**
-	 * Ritorna un nuovo IteratoreAgenda per iterare su ogni
-	 * oggetto {@code Appuntamento}.
-	 * <p>{@code IteratoreAgenda} implementa l'interfaccia {@link Iterator}.
+	 * Ritorna un nuovo {@link Iterator} per quest' {@code Agenda}, 
+	 * utile a iterare su ogni oggetto {@code Appuntamento}.
 	 * 
-	 * @return un {@code IteratoreAgenda} di quest'agenda.
+	 * @return un {@code Iterator<Appuntamento>}.
 	 */
 	
 	@Override
