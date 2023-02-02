@@ -187,7 +187,7 @@ public class Agenda implements Iterable<Appuntamento> {
 			} 	
 		reader.close();	
 		ordinaAppuntamenti(appuntamenti);
-		saved = (PatternMatcher.create(".*\\.txt$", file.getName()).matches()) ? true:false;
+		saved = PatternMatcher.create(".*\\.txt$", file.getName()).matches();
 
 		if(!errString[1].equals(errString[0]))	System.err.println(errString[1] + "Agenda " + nomeAgenda + " creata ignorando le righe elencate.");
 	}
