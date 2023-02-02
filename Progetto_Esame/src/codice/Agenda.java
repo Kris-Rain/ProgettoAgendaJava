@@ -795,7 +795,7 @@ public class Agenda implements Iterable<Appuntamento> {
 	
 	
 	private String[] dataOrarioSplit(String dataOrario) {
-		String[] splitted = dataOrario.split("(\\s)+");
+		String[] splitted = dataOrario.strip().split("(\\s)+");
 		return splitted.length == 1 ? new String[] {dataOrario, ""} : splitted;
 	}
 
